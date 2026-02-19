@@ -48,3 +48,4 @@ class Booking(models.Model):
         related_name='booking',
     )
     cancelled_at = models.DateTimeField(null=True, blank=True)
+    refund_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

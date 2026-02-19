@@ -46,6 +46,14 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'readings.tasks.billing_tick',
         'schedule': 60.0,
     },
+    'finalize-sessions': {
+        'task': 'readings.tasks.finalize_sessions',
+        'schedule': 300.0,  # Every 5 minutes
+    },
+    'reconnect-timeout': {
+        'task': 'readings.tasks.handle_reconnect_timeout',
+        'schedule': 30.0,  # Every 30 seconds
+    },
 }
 CACHES = {
     'default': {
@@ -92,6 +100,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django_htmx',
     'rest_framework',
+    'django_celery_beat',
     'core',
     'accounts',
     'wallets',

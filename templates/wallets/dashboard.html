@@ -1,8 +1,82 @@
 {% extends 'base.html' %}
+{% load humanize %}
 {% block title %}Wallet - SoulSeer{% endblock %}
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-16">
-  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Wallet</h1>
-  <p class="font-body text-lg text-white/80">Your wallet and transaction history.</p>
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">My Wallet</h1>
+
+  <div class="grid gap-8 md:grid-cols-2 mb-8">
+    <!-- Balance Card -->
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Current Balance</h2>
+      <p class="text-4xl text-white font-bold">${{ wallet.balance|floatformat:2 }}</p>
+      <p class="text-white/60 mt-2 text-sm">Available for readings and purchases</p>
+    </section>
+
+    <!-- Top Up Card -->
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Add Funds</h2>
+      <form method="post" action="{% url 'wallet_topup' %}" class="flex flex-col gap-4">
+        {% csrf_token %}
+        <div class="flex gap-2">
+          <button type="submit" name="amount" value="10" class="flex-1 px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">$10</button>
+          <button type="submit" name="amount" value="25" class="flex-1 px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">$25</button>
+          <button type="submit" name="amount" value="50" class="flex-1 px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">$50</button>
+          <button type="submit" name="amount" value="100" class="flex-1 px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">$100</button>
+        </div>
+      </form>
+      <p class="text-white/60 mt-3 text-sm">Secure payment via Stripe</p>
+    </section>
+  </div>
+
+  <!-- Transaction History -->
+  <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+    <h2 class="font-heading text-2xl text-soulseer-pink mb-6">Transaction History</h2>
+    
+    {% if entries %}
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-soulseer-pink/30">
+            <th class="pb-3 text-soulseer-pink font-body">Date</th>
+            <th class="pb-3 text-soulseer-pink font-body">Type</th>
+            <th class="pb-3 text-soulseer-pink font-body text-right">Amount</th>
+            <th class="pb-3 text-soulseer-pink font-body">Reference</th>
+          </tr>
+        </thead>
+        <tbody class="font-body">
+          {% for entry in entries %}
+          <tr class="border-b border-white/10">
+            <td class="py-3 text-white/80">{{ entry.created_at|date:"M d, Y H:i" }}</td>
+            <td class="py-3">
+              <span class="px-2 py-1 rounded text-xs
+                {% if entry.entry_type == 'top_up' %}bg-green-900/50 text-green-400
+                {% elif entry.entry_type == 'refund' %}bg-blue-900/50 text-blue-400
+                {% elif entry.entry_type == 'session_charge' or entry.entry_type == 'booking' or entry.entry_type == 'gift' %}bg-red-900/50 text-red-400
+                {% else %}bg-soulseer-pink/20 text-soulseer-pink{% endif %}">
+                {{ entry.get_entry_type_display }}
+              </span>
+            </td>
+            <td class="py-3 text-right {% if entry.amount > 0 %}text-green-400{% else %}text-red-400{% endif %}">
+              {% if entry.amount > 0 %}+{% endif %}{{ entry.amount|floatformat:2 }}
+            </td>
+            <td class="py-3 text-white/60 text-sm">
+              {% if entry.session %}
+                Session #{{ entry.session.pk }}
+              {% elif entry.reference_type %}
+                {{ entry.reference_type|title }}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="text-white/60 text-center py-8">No transactions yet.</p>
+    {% endif %}
+  </section>
 </div>
 {% endblock %}

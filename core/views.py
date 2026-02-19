@@ -1,5 +1,11 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+
+
+def health_check(request):
+    """Health check endpoint for Fly.io"""
+    return JsonResponse({"status": "healthy", "service": "soulseer"})
 
 
 def home(request):

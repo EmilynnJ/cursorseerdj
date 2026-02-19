@@ -32,3 +32,4 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     delivery_url = models.URLField(blank=True, help_text='Signed URL for digital delivery')
+    delivery_expires_at = models.DateTimeField(null=True, blank=True)

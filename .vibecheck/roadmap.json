@@ -1,0 +1,126 @@
+{
+  "items": [
+    {
+      "title": "Harden Docker configuration",
+      "description": "Review Dockerfile for multi-stage builds, non-root user, and minimal base images",
+      "status": "planned",
+      "priority": "medium",
+      "aiSuggested": true,
+      "category": "security",
+      "source": "signal",
+      "id": "1771526201831n0wc9ys7n",
+      "createdAt": "2026-02-19T18:36:41.831Z"
+    },
+    {
+      "title": "Set up CI/CD pipeline",
+      "description": "No continuous integration detected — add GitHub Actions, CircleCI, or GitLab CI",
+      "status": "planned",
+      "priority": "high",
+      "aiSuggested": true,
+      "category": "feature",
+      "source": "signal",
+      "id": "1771526201831ao5496m94",
+      "createdAt": "2026-02-19T18:36:41.831Z"
+    },
+    {
+      "title": "Add test infrastructure",
+      "description": "No test directory found — set up a testing framework (Jest, Vitest, Mocha)",
+      "status": "planned",
+      "priority": "high",
+      "aiSuggested": true,
+      "category": "test",
+      "source": "signal",
+      "id": "177152620183173wjckvt0",
+      "createdAt": "2026-02-19T18:36:41.831Z"
+    },
+    {
+      "title": "Add a LICENSE file",
+      "description": "No license file found — add one to clarify usage rights for contributors and users",
+      "status": "planned",
+      "priority": "low",
+      "aiSuggested": true,
+      "category": "docs",
+      "source": "signal",
+      "id": "1771526201831fy0h2wwcu",
+      "createdAt": "2026-02-19T18:36:41.831Z"
+    }
+  ],
+  "adaptations": [
+    {
+      "id": "1771526201831dfsr5s",
+      "timestamp": "2026-02-19T18:36:41.831Z",
+      "type": "signal_detected",
+      "itemId": "1771526201831n0wc9ys7n",
+      "itemTitle": "Harden Docker configuration",
+      "description": "Detected: Docker config found"
+    },
+    {
+      "id": "17715262018311c08e8",
+      "timestamp": "2026-02-19T18:36:41.831Z",
+      "type": "signal_detected",
+      "itemId": "1771526201831ao5496m94",
+      "itemTitle": "Set up CI/CD pipeline",
+      "description": "Detected: No CI/CD config detected"
+    },
+    {
+      "id": "1771526201831edfn7z",
+      "timestamp": "2026-02-19T18:36:41.831Z",
+      "type": "signal_detected",
+      "itemId": "177152620183173wjckvt0",
+      "itemTitle": "Add test infrastructure",
+      "description": "Detected: No test directory found"
+    },
+    {
+      "id": "1771526201831xn4t54",
+      "timestamp": "2026-02-19T18:36:41.831Z",
+      "type": "signal_detected",
+      "itemId": "1771526201831fy0h2wwcu",
+      "itemTitle": "Add a LICENSE file",
+      "description": "Detected: No LICENSE file"
+    }
+  ],
+  "lastUpdated": "2026-02-19T18:36:41.831Z",
+  "lastSignalHash": "has-docker:true|has-ci:false|no-ci:true|no-tests:true|no-env-example:false|has-prisma:false|has-drizzle:false|large-bundle:false|no-license:true",
+  "projectSignals": [
+    {
+      "type": "has-docker",
+      "detected": true,
+      "detail": "Docker config found"
+    },
+    {
+      "type": "has-ci",
+      "detected": false
+    },
+    {
+      "type": "no-ci",
+      "detected": true,
+      "detail": "No CI/CD config detected"
+    },
+    {
+      "type": "no-tests",
+      "detected": true,
+      "detail": "No test directory found"
+    },
+    {
+      "type": "no-env-example",
+      "detected": false
+    },
+    {
+      "type": "has-prisma",
+      "detected": false
+    },
+    {
+      "type": "has-drizzle",
+      "detected": false
+    },
+    {
+      "type": "large-bundle",
+      "detected": false
+    },
+    {
+      "type": "no-license",
+      "detected": true,
+      "detail": "No LICENSE file"
+    }
+  ]
+}

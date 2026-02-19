@@ -1,6 +1,7 @@
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 MODALITY_CHOICES = [
     ('text', 'Text'),
@@ -26,6 +27,9 @@ class ReaderProfile(models.Model):
 
     def __str__(self):
         return self.slug or str(self.user)
+
+    def get_absolute_url(self):
+        return reverse('reader_detail', kwargs={'slug': self.slug})
 
     def get_specialties_list(self):
         if not self.specialties:

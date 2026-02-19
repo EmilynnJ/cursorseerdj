@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Community Forums - SoulSeer{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+  <div class="max-w-4xl mx-auto px-4">
+    
+    <!-- Page Header -->
+    <div class="mb-8 flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">Community Forums</h1>
+        <p class="mt-2 text-gray-600">Connect with other spiritual seekers</p>
+      </div>
+      <a href="{% url 'create_thread' %}" class="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium">
+        New Thread
+      </a>
+    </div>
+
+    <!-- Categories Tabs -->
+    <div class="flex gap-2 mb-6 overflow-x-auto border-b border-gray-200">
+      <a href="{% url 'community_forums' %}" class="px-4 py-3 font-medium text-gray-700 border-b-2 border-transparent hover:border-gray-300 whitespace-nowrap">
+        All Topics
+      </a>
+      {% for category in categories %}
+        <a href="?category={{ category.slug }}" class="px-4 py-3 font-medium text-gray-700 border-b-2 border-transparent hover:border-gray-300 whitespace-nowrap">
+          {{ category.name }}
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Threads List -->
+    <div class="space-y-4">
+      {% for thread in threads %}
+        <a href="{% url 'thread_detail' thread.id %}" class="block p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition border-l-4 border-blue-500">
+          <div class="flex justify-between items-start mb-3">
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900">{{ thread.title }}</h3>
+              <p class="text-sm text-gray-600 mt-1">by {{ thread.author.profile.display_name }} • {{ thread.created_at|date:"M d, Y" }}</p>
+            </div>
+            {% if thread.is_pinned %}
+              <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">📌 Pinned</span>
+            {% endif %}
+          </div>
+          
+          <p class="text-gray-700 text-sm mb-4">{{ thread.content|truncatewords:30 }}</p>
+          
+          <div class="flex items-center gap-6 text-sm text-gray-600">
+            <span>💬 {{ thread.post_count }} replies</span>
+            <span>👁️ {{ thread.view_count }} views</span>
+            <span>Last reply {{ thread.last_post_at|date:"M d" }}</span>
+          </div>
+        </a>
+      {% empty %}
+        <div class="text-center py-12 bg-white rounded-lg">
+          <p class="text-gray-600 text-lg">No threads yet. Be the first to start a conversation!</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

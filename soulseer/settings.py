@@ -46,6 +46,7 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'readings.tasks.billing_tick',
         'schedule': 60.0,
     },
+<<<<<<< HEAD
     'finalize-sessions': {
         'task': 'readings.tasks.finalize_sessions',
         'schedule': 300.0,  # Every 5 minutes
@@ -53,6 +54,11 @@ CELERY_BEAT_SCHEDULE = {
     'reconnect-timeout': {
         'task': 'readings.tasks.handle_reconnect_timeout',
         'schedule': 30.0,  # Every 30 seconds
+=======
+    'expire-grace-periods': {
+        'task': 'readings.tasks.expire_grace_periods',
+        'schedule': 30.0,
+>>>>>>> 786cda79204bf24bd3fb50381d4299beba0a7e2e
     },
 }
 CACHES = {
@@ -180,3 +186,58 @@ if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
     sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], traces_sample_rate=0.1)
+# Security settings (production-ready)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_BROWSER_XSS_FILTER = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_CONTENT_SECURITY_POLICY = {
+        "default-src": ("'self'",),
+        "script-src": ("'self'", "cdn.jsdelivr.net", "*.agora.io", "https://js.stripe.com"),
+        "connect-src": ("'self'", "*.agora.io", "https://api.stripe.com"),
+        "style-src": ("'self'", "cdn.jsdelivr.net", "'unsafe-inline'"),
+        "img-src": ("'self'", "data:", "https:"),
+        "font-src": ("'self'", "cdn.jsdelivr.net"),
+    }
+
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': env('DJANGO_LOG_LEVEL', default='INFO'),
+            'propagate': False,
+        },
+        'readings': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'wallets': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}

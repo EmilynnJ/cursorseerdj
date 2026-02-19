@@ -1,0 +1,1 @@
+head -n 2000 c:\Users\emily\Downloads\CURSSEER\cursorseerdj\readings\models.py

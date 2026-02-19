@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Livestream - {{ livestream.title }} - SoulSeer{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 py-4">
+  <div class="max-w-7xl mx-auto px-4">
+    
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
+      
+      <!-- Main Stream -->
+      <div class="lg:col-span-3">
+        <div class="bg-black rounded-lg shadow-lg overflow-hidden">
+          
+          <!-- Video Container -->
+          <div id="remote-container" class="w-full bg-gray-900 rounded-lg flex items-center justify-center" style="height: 500px;">
+            <div class="text-center">
+              {% if livestream.is_live %}
+                <div class="text-gray-400 text-lg">🔴 LIVE</div>
+                <div class="mt-4 inline-block">
+                  <div class="animate-pulse rounded-full h-3 w-3 bg-red-500"></div>
+                </div>
+              {% else %}
+                <div class="text-gray-400 text-lg">Stream Offline</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Stream Info -->
+          <div class="bg-gray-800 px-6 py-4 border-t border-gray-700">
+            <h1 class="text-2xl font-bold text-white mb-2">{{ livestream.title }}</h1>
+            <div class="flex items-center justify-between text-gray-300 text-sm">
+              <div>
+                <span class="font-medium">{{ livestream.reader.user.profile.display_name }}</span>
+              </div>
+              <div>
+                <span id="viewer-count">0</span> viewers
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stream Description -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-3">About This Stream</h2>
+          <p class="text-gray-700">{{ livestream.description }}</p>
+        </div>
+      </div>
+
+      <!-- Chat & Gifting Sidebar -->
+      <div class="lg:col-span-1">
+        
+        <!-- Chat -->
+        <div class="bg-white rounded-lg shadow-lg h-96 flex flex-col mb-4">
+          <div class="px-4 py-3 border-b border-gray-200 font-semibold text-gray-900">Live Chat</div>
+          
+          <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-3 space-y-3 text-sm">
+            <!-- Messages load here -->
+          </div>
+          
+          {% if livestream.is_live %}
+            <div class="p-3 border-t border-gray-200">
+              <form id="chat-form" class="flex gap-2">
+                <input type="text" id="chat-input" placeholder="Message..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" maxlength="500">
+                <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+                </button>
+              </form>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Gifting -->
+        {% if livestream.is_live and livestream.visibility != 'private' %}
+          <div class="bg-white rounded-lg shadow-lg p-4">
+            <h3 class="font-semibold text-gray-900 mb-3">Send Gift</h3>
+            <div class="space-y-2">
+              {% for gift in available_gifts %}
+                <button class="w-full px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition gift-btn" data-gift-id="{{ gift.id }}" data-gift-name="{{ gift.name }}" data-gift-price="{{ gift.price }}">
+                  <div class="font-medium text-gray-900">{{ gift.name }}</div>
+                  <div class="text-sm text-gray-600">${{ gift.price }}</div>
+                </button>
+              {% endfor %}
+            </div>
+            <div id="gift-message" class="mt-3 text-sm text-center"></div>
+          </div>
+        {% endif %}
+
+        <!-- Viewer List -->
+        <div class="bg-white rounded-lg shadow-lg p-4 mt-4">
+          <h3 class="font-semibold text-gray-900 mb-3">Viewers</h3>
+          <div id="viewer-list" class="space-y-2 max-h-48 overflow-y-auto">
+            <!-- Viewers load here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Initialize Agora RTC
+const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+const channelName = '{{ livestream.agora_channel }}';
+const uid = {{ request.user.id }};
+
+async function joinLivestream() {
+  try {
+    // Get RTC token
+    const response = await fetch('{% url "api_get_livestream_token" %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      body: JSON.stringify({ livestream_id: '{{ livestream.id }}' })
+    });
+    const data = await response.json();
+    
+    if (!data.token) {
+      alert('Premium content requires active subscription');
+      return;
+    }
+
+    // Join as viewer (audio only, no publishing)
+    await client.join('{{ AGORA_APP_ID }}', channelName, data.token, uid);
+
+    // Handle remote stream (reader's stream)
+    client.on('user-published', async (user, mediaType) => {
+      await client.subscribe(user, mediaType);
+      if (mediaType === 'video') {
+        user.videoTrack.play('remote-container');
+      }
+      if (mediaType === 'audio') {
+        user.audioTrack.play();
+      }
+    });
+  } catch (error) {
+    console.error('Failed to join livestream:', error);
+  }
+}
+
+// Chat via RTM
+document.getElementById('chat-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const message = input.value.trim();
+  if (message) {
+    // TODO: Implement RTM messaging
+    input.value = '';
+  }
+});
+
+// Gifting
+document.querySelectorAll('.gift-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    const giftId = btn.dataset.giftId;
+    const giftName = btn.dataset.giftName;
+    const giftPrice = btn.dataset.giftPrice;
+
+    if (confirm(`Send ${giftName} ($${giftPrice})?`)) {
+      const response = await fetch('{% url "send_gift" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({
+          livestream_id: '{{ livestream.id }}',
+          gift_id: giftId
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        document.getElementById('gift-message').textContent = `Sent ${giftName}! 🎁`;
+        setTimeout(() => {
+          document.getElementById('gift-message').textContent = '';
+        }, 3000);
+      } else {
+        alert(data.error || 'Failed to send gift');
+      }
+    }
+  });
+});
+
+joinLivestream();
+</script>
+{% endblock %}

@@ -1,33 +1,203 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load humanize %}
+
 {% block title %}Client Dashboard - SoulSeer{% endblock %}
+
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-16">
-  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">My Dashboard</h1>
+<div class="min-h-screen bg-gray-50 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Your Dashboard</h1>
+      <p class="mt-2 text-gray-600">Welcome, {{ request.user.profile.display_name }}</p>
+    </div>
 
-  <div class="grid gap-8 md:grid-cols-2">
-    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
-      <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Wallet</h2>
-      <p class="text-2xl text-white">${{ wallet.balance|floatformat:2 }}</p>
-      <a href="{% url 'wallet_dashboard' %}" class="mt-2 inline-block text-soulseer-pink/80 hover:text-soulseer-pink">Top up & view history →</a>
-    </section>
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+      
+      <!-- Left Column: Main Content -->
+      <div class="md:col-span-2">
+        
+        <!-- Wallet Card -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-900">Wallet Balance</h2>
+            <a href="{% url 'wallet_topup' %}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Add Funds
+            </a>
+          </div>
+          <div class="text-4xl font-bold text-green-600">${{ wallet.balance|floatformat:2 }}</div>
+          <p class="text-gray-600 mt-2">Available for reading sessions</p>
+        </div>
 
-    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
-      <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Scheduled Sessions</h2>
-      {% for b in bookings %}
-      <p class="font-body text-white/80">{{ b.slot.reader.get_full_name|default:b.slot.reader.username }} — {{ b.slot.start|date:"M d, H:i" }}</p>
-      {% empty %}
-      <p class="text-white/60">No upcoming sessions.</p>
-      {% endfor %}
-      <a href="{% url 'schedule' %}" class="mt-2 inline-block text-soulseer-pink/80 hover:text-soulseer-pink">View schedule →</a>
-    </section>
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Transactions</h2>
+          {% if recent_transactions %}
+            <div class="space-y-4">
+              {% for entry in recent_transactions %}
+                <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
+                  <div>
+                    <div class="font-medium text-gray-900">{{ entry.get_entry_type_display }}</div>
+                    <div class="text-sm text-gray-600">{{ entry.created_at|date:"M d, Y H:i" }}</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-semibold {% if entry.amount > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                      {% if entry.amount > 0 %}+{% endif %}${{ entry.amount|floatformat:2 }}
+                    </div>
+                    {% if entry.session %}
+                      <div class="text-xs text-gray-600">Session with {{ entry.session.reader.reader_profile.user.profile.display_name }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+            <a href="{% url 'wallet_history' %}" class="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium">
+              View All →
+            </a>
+          {% else %}
+            <p class="text-gray-600 text-center py-8">No transactions yet</p>
+          {% endif %}
+        </div>
+
+        <!-- Upcoming Bookings -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Upcoming Sessions</h2>
+          {% if upcoming_bookings %}
+            <div class="space-y-4">
+              {% for booking in upcoming_bookings %}
+                <div class="flex justify-between items-start py-4 border-b border-gray-200 last:border-b-0">
+                  <div class="flex-1">
+                    <div class="font-medium text-gray-900">
+                      {{ booking.slot.reader.reader_profile.user.profile.display_name }}
+                    </div>
+                    <div class="text-sm text-gray-600 mt-1">
+                      {{ booking.slot.start|date:"M d, Y \a\t H:i" }} ({{ booking.slot.duration_minutes }} min)
+                    </div>
+                    <div class="inline-block mt-2 px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded">
+                      {{ booking.get_status_display }}
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-semibold text-green-600">${{ booking.amount|floatformat:2 }}</div>
+                    {% if booking.status == 'booked' %}
+                      <a href="{% url 'session_join' booking.slot.id %}" class="mt-2 block text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        Join Session
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-gray-600 text-center py-8">No upcoming bookings</p>
+            <a href="{% url 'schedule_list' %}" class="text-center block text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Browse Readers →
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Session Notes -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Your Notes from Sessions</h2>
+          {% if session_notes %}
+            <div class="space-y-4">
+              {% for note in session_notes %}
+                <div class="py-4 border-b border-gray-200 last:border-b-0">
+                  <div class="flex justify-between items-start mb-2">
+                    <div>
+                      <div class="font-medium text-gray-900">
+                        About {{ note.session.reader.reader_profile.user.profile.display_name }}
+                      </div>
+                      <div class="text-sm text-gray-600">
+                        {{ note.session.ended_at|date:"M d, Y" }}
+                      </div>
+                    </div>
+                  </div>
+                  <p class="text-gray-700 mt-2">{{ note.body }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-gray-600 text-center py-8">No notes yet. Add notes after your sessions to remember details.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right Column: Sidebar -->
+      <div>
+        
+        <!-- Quick Stats -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Stats</h3>
+          <div class="space-y-4">
+            <div>
+              <div class="text-sm text-gray-600">Total Sessions</div>
+              <div class="text-2xl font-bold text-gray-900">{{ total_sessions }}</div>
+            </div>
+            <div class="border-t pt-4">
+              <div class="text-sm text-gray-600">Total Spent</div>
+              <div class="text-2xl font-bold text-gray-900">${{ total_spent|floatformat:2 }}</div>
+            </div>
+            <div class="border-t pt-4">
+              <div class="text-sm text-gray-600">Hours with Readers</div>
+              <div class="text-2xl font-bold text-gray-900">{{ total_minutes|floatformat:1 }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Favorites -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Favorite Readers</h3>
+          {% if favorite_readers %}
+            <div class="space-y-3">
+              {% for reader in favorite_readers %}
+                <div class="flex items-start space-x-3 pb-3 border-b border-gray-200 last:border-b-0">
+                  <img src="{{ reader.avatar_url }}" alt="{{ reader.user.profile.display_name }}" 
+                       class="w-10 h-10 rounded-full object-cover">
+                  <div class="flex-1">
+                    <a href="{% url 'reader_detail' reader.slug %}" class="text-sm font-medium text-gray-900 hover:text-blue-600">
+                      {{ reader.user.profile.display_name }}
+                    </a>
+                    <div class="text-xs text-gray-600">{{ reader.specialties }}</div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-gray-600 text-center py-4 text-sm">No favorites yet</p>
+          {% endif %}
+        </div>
+
+        <!-- Quick Links -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
+          <div class="space-y-2">
+            <a href="{% url 'readers_list' %}" class="block text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Browse Readers
+            </a>
+            <a href="{% url 'schedule_list' %}" class="block text-blue-600 hover:text-blue-800 text-sm font-medium">
+              View Schedules
+            </a>
+            <a href="{% url 'messages_inbox' %}" class="block text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Messages
+            </a>
+            <a href="{% url 'profile_edit' %}" class="block text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Edit Profile
+            </a>
+            <a href="{% url 'logout' %}" class="block text-red-600 hover:text-red-800 text-sm font-medium mt-4">
+              Logout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <section class="mt-8 p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
-    <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Favorites</h2>
-    <div class="flex flex-wrap gap-4">
-      {% for f in favorites %}
-      <a href="{% url 'reader_profile' f.reader.slug %}" class="p-3 rounded border border-soulseer-pink/30 hover:border-soulseer-pink/60">{{ f.reader.user.get_full_name|default:f.reader.slug }}</a>
+</div>
+{% endblock %}
       {% empty %}
       <p class="text-white/60">No favorite readers yet.</p>
       {% endfor %}

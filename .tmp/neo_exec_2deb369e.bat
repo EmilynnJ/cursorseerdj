@@ -1,0 +1,1 @@
+type c:\Users\emily\Downloads\CURSSEER\cursorseerdj\readers\models.py && type c:\Users\emily\Downloads\CURSSEER\cursorseerdj\readings\models.py && type c:\Users\emily\Downloads\CURSSEER\cursorseerdj\wallets\models.py && type c:\Users\emily\Downloads\CURSSEER\cursorseerdj\shop\models.py && type c:\Users\emily\Downloads\CURSSEER\cursorseerdj\scheduling\models.py

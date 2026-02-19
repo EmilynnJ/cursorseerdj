@@ -1,0 +1,1 @@
+dir /s /b c:\Users\emily\Downloads\CURSSEER\cursorseerdj\*.py | findstr /v "migrations"

@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+
+{% block title %}Session: {{ session.reader.user.profile.display_name }} - SoulSeer{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-900 py-4">
+  <div class="max-w-7xl mx-auto px-4">
+    
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
+      
+      <!-- Main Video/Chat Area -->
+      <div class="lg:col-span-3">
+        <div class="bg-black rounded-lg shadow-lg overflow-hidden">
+          
+          <!-- Video Container -->
+          <div id="remote-container" class="w-full bg-gray-900 rounded-lg flex items-center justify-center" style="height: 500px;">
+            <div class="text-center">
+              <div class="text-gray-400 text-lg">Connecting to reader...</div>
+              <div class="mt-4 inline-block">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="bg-gray-800 px-6 py-4 flex items-center justify-between">
+            <div class="text-white text-sm">
+              <span class="font-semibold">{{ session.reader.user.profile.display_name }}</span>
+              <span class="text-gray-400 ml-2">{{ session.get_modality_display }}</span>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              {% if session.modality != 'text' %}
+                <button id="toggle-video" class="p-3 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition" title="Toggle Video">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4z"></path></svg>
+                </button>
+                <button id="toggle-audio" class="p-3 rounded-full bg-gray-700 hover:bg-gray-600 text-white transition" title="Toggle Audio">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M8 16A6 6 0 1020 10v1h-2v-1a4 4 0 00-8 0v7a4 4 0 008 0v-1h2v1a6 6 0 01-12 0z"></path></svg>
+                </button>
+              {% endif %}
+              <button id="end-session" class="px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition">
+                End Session
+              </button>
+            </div>
+          </div>
+
+          <!-- Session Info Bar -->
+          <div class="bg-gray-800 px-6 py-3 border-t border-gray-700 flex items-center justify-between text-white text-sm">
+            <div>
+              <span class="text-gray-400">Session Time:</span>
+              <span id="session-time" class="ml-2 font-mono font-semibold">00:00</span>
+            </div>
+            <div>
+              <span class="text-gray-400">Rate:</span>
+              <span class="ml-2 font-semibold text-green-400">${{ session.rate_per_minute }}/min</span>
+            </div>
+            <div>
+              <span class="text-gray-400">Estimated Cost:</span>
+              <span id="estimated-cost" class="ml-2 font-semibold">$0.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat & Info Sidebar -->
+      <div class="lg:col-span-1">
+        
+        <!-- Chat -->
+        <div class="bg-white rounded-lg shadow-lg h-96 flex flex-col">
+          <div class="px-4 py-3 border-b border-gray-200 font-semibold text-gray-900">Chat</div>
+          
+          <div id="chat-messages" class="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            <!-- Messages load here -->
+          </div>
+          
+          <div class="p-3 border-t border-gray-200">
+            <form id="chat-form" class="flex gap-2">
+              <input type="text" id="chat-input" placeholder="Message..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" maxlength="500">
+              <button type="submit" class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z"></path></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Reader Info -->
+        <div class="bg-white rounded-lg shadow-lg p-4 mt-4">
+          <h3 class="font-semibold text-gray-900 mb-3">About Reader</h3>
+          <div class="space-y-3">
+            <div>
+              <div class="text-xs text-gray-600 font-medium uppercase">Specialties</div>
+              <p class="text-sm text-gray-700 mt-1">{{ session.reader.specialties }}</p>
+            </div>
+            {% if session.reader.user.profile.bio %}
+              <div>
+                <div class="text-xs text-gray-600 font-medium uppercase">Bio</div>
+                <p class="text-sm text-gray-700 mt-1">{{ session.reader.user.profile.bio|truncatewords:30 }}</p>
+              </div>
+            {% endif %}
+            <div class="flex items-center pt-3 border-t border-gray-200">
+              <div class="flex-1">
+                <div class="text-xs text-gray-600">Rating</div>
+                <div class="text-sm font-semibold text-gray-900 mt-1">⭐ {{ session.reader.avg_rating|floatformat:1 }}/5</div>
+              </div>
+              <div class="flex-1">
+                <div class="text-xs text-gray-600">Reviews</div>
+                <div class="text-sm font-semibold text-gray-900 mt-1">{{ session.reader.review_count }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Initialize Agora RTC
+const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+const rtcToken = '{{ rtc_token }}';
+const channelName = '{{ session.channel_name }}';
+const uid = {{ request.user.id }};
+
+let localAudioTrack;
+let localVideoTrack;
+let sessionStartTime = Date.now();
+let isAudioEnabled = true;
+let isVideoEnabled = true;
+
+async function joinSession() {
+  try {
+    // Get RTC token
+    const response = await fetch('{% url "api_get_rtc_token" %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      body: JSON.stringify({ session_id: '{{ session.id }}' })
+    });
+    const data = await response.json();
+    const token = data.token;
+
+    // Join channel
+    await client.join('{{ AGORA_APP_ID }}', channelName, token, uid);
+
+    // Create local audio/video tracks
+    {% if session.modality != 'text' %}
+      localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
+      {% if session.modality == 'video' %}
+        localVideoTrack = await AgoraRTC.createCameraVideoTrack();
+      {% endif %}
+      
+      await client.publish([localAudioTrack{% if session.modality == 'video' %}, localVideoTrack{% endif %}]);
+    {% endif %}
+
+    // Handle remote users
+    client.on('user-published', async (user, mediaType) => {
+      await client.subscribe(user, mediaType);
+      if (mediaType === 'video') {
+        const remoteContainer = document.getElementById('remote-container');
+        const videoTrack = user.videoTrack;
+        videoTrack.play('remote-container');
+      }
+      if (mediaType === 'audio') {
+        user.audioTrack.play();
+      }
+    });
+
+    // Start session timer
+    startSessionTimer();
+
+    // Notify backend session started
+    await fetch('{% url "api_session_join" %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      body: JSON.stringify({ session_id: '{{ session.id }}' })
+    });
+  } catch (error) {
+    console.error('Failed to join session:', error);
+    alert('Failed to join session. Please try again.');
+  }
+}
+
+function startSessionTimer() {
+  setInterval(() => {
+    const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    const seconds = elapsed % 60;
+    document.getElementById('session-time').textContent = 
+      `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    
+    // Update estimated cost
+    const minutes_decimal = elapsed / 60;
+    const cost = (minutes_decimal * {{ session.rate_per_minute }}).toFixed(2);
+    document.getElementById('estimated-cost').textContent = `$${cost}`;
+  }, 1000);
+}
+
+document.getElementById('toggle-audio').addEventListener('click', async () => {
+  if (localAudioTrack) {
+    isAudioEnabled = !isAudioEnabled;
+    await localAudioTrack.setEnabled(isAudioEnabled);
+    event.target.closest('button').classList.toggle('bg-red-600', !isAudioEnabled);
+  }
+});
+
+document.getElementById('toggle-video').addEventListener('click', async () => {
+  if (localVideoTrack) {
+    isVideoEnabled = !isVideoEnabled;
+    await localVideoTrack.setEnabled(isVideoEnabled);
+    event.target.closest('button').classList.toggle('bg-red-600', !isVideoEnabled);
+  }
+});
+
+document.getElementById('end-session').addEventListener('click', async () => {
+  if (confirm('End this session?')) {
+    // Leave Agora
+    await client.leave();
+    if (localAudioTrack) localAudioTrack.close();
+    if (localVideoTrack) localVideoTrack.close();
+
+    // Notify backend
+    await fetch('{% url "api_session_end" %}', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+      body: JSON.stringify({ session_id: '{{ session.id }}' })
+    });
+
+    window.location.href = '{% url "session_detail" session.id %}';
+  }
+});
+
+// Chat functionality
+document.getElementById('chat-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const message = input.value.trim();
+  if (message) {
+    // Emit via RTM
+    // TODO: Implement RTM messaging
+    input.value = '';
+  }
+});
+
+// Start session on load
+joinSession();
+</script>
+{% endblock %}

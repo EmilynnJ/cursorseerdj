@@ -1,20 +1,131 @@
-{% extends 'base.html' %}
-{% block title %}Availability - SoulSeer{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Manage Availability - SoulSeer{% endblock %}
+
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-16">
-  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Set Availability</h1>
-  <p class="font-body text-white/80 mb-6">Set your weekly recurring availability. (Slot generation runs from this.)</p>
-  <form method="post" class="space-y-4">
-    {% csrf_token %}
-    {% for i in "1234567" %}
-    <div class="flex items-center gap-4">
-      <span class="w-24 text-white/80">{% cycle "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun" %}</span>
-      <input type="time" name="day_{{ forloop.counter0 }}_start" class="bg-soulseer-darker border border-soulseer-pink/50 rounded px-3 py-2 text-white">
-      <span class="text-white/60">to</span>
-      <input type="time" name="day_{{ forloop.counter0 }}_end" class="bg-soulseer-darker border border-soulseer-pink/50 rounded px-3 py-2 text-white">
+<div class="min-h-screen bg-gray-50 py-12">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Manage Availability</h1>
+      <p class="mt-2 text-gray-600">Set your weekly availability for client bookings</p>
     </div>
-    {% endfor %}
-    <button type="submit" class="px-6 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Save</button>
-  </form>
+
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      
+      <!-- Main Content -->
+      <div class="lg:col-span-2">
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-4">
+              {% for day_data in availability_data %}
+                <div class="p-4 border border-gray-200 rounded-lg">
+                  <div class="font-semibold text-gray-900 mb-3">{{ day_data.day }}</div>
+                  
+                  <div class="space-y-3">
+                    {% for slot in day_data.slots %}
+                      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                          <input type="time" name="day_{{ forloop.parentloop.counter0 }}_start" value="{{ slot.start_time }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                          <input type="time" name="day_{{ forloop.parentloop.counter0 }}_end" value="{{ slot.end_time }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        <div>
+                          <label class="block text-sm font-medium text-gray-700 mb-1">Available</label>
+                          <div class="flex items-center h-10">
+                            <input type="checkbox" name="day_{{ forloop.parentloop.counter0 }}_enabled" {% if slot.is_available %}checked{% endif %} class="rounded">
+                            <span class="ml-2 text-sm text-gray-600">Enabled</span>
+                          </div>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 border-t">
+              <a href="{% url 'reader_dashboard' %}" class="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+                Cancel
+              </a>
+              <button type="submit" class="px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                Save Availability
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tips -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+          <h3 class="font-semibold text-blue-900 mb-2">💡 Tips</h3>
+          <ul class="text-sm text-blue-800 space-y-1">
+            <li>• Set overlapping slots for multiple bookings on the same day</li>
+            <li>• Each slot should be at least 15 minutes for text readings</li>
+            <li>• 30+ minutes recommended for voice and video sessions</li>
+            <li>• Times are in your local timezone</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <div class="bg-white rounded-lg shadow-md p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Settings</h3>
+          
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Timezone</label>
+              <select class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                <option>America/New_York</option>
+                <option>America/Chicago</option>
+                <option>America/Los_Angeles</option>
+                <option>Europe/London</option>
+                <option>Europe/Paris</option>
+                <option>Asia/Tokyo</option>
+              </select>
+            </div>
+
+            <div class="pt-4 border-t space-y-2">
+              <button type="button" class="w-full px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700">
+                Full Time (9am-9pm)
+              </button>
+
+              <button type="button" class="w-full px-4 py-2 text-sm text-white bg-gray-600 rounded-lg hover:bg-gray-700">
+                Part Time (5pm-9pm)
+              </button>
+
+              <button type="button" class="w-full px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50">
+                Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Bookings -->
+        <div class="bg-white rounded-lg shadow-md p-6 mt-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">This Week's Bookings</h3>
+          {% if weekly_bookings %}
+            <div class="space-y-3">
+              {% for booking in weekly_bookings %}
+                <div class="p-3 bg-gray-50 rounded border border-gray-200">
+                  <div class="font-medium text-gray-900 text-sm">{{ booking.client.profile.display_name }}</div>
+                  <div class="text-xs text-gray-600 mt-1">{{ booking.start|date:"M d, H:i" }} ({{ booking.duration_minutes }}min)</div>
+                </div>
+              {% empty %}
+                <p class="text-gray-600 text-center py-4 text-sm">No bookings this week</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

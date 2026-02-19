@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Shop - SoulSeer{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Shop</h1>
+      <p class="mt-2 text-gray-600">Digital guides, tarot decks, and spiritual products</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-4 mb-8">
+      <form method="get" class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+          <select name="category" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <option value="">All Products</option>
+            <option value="guides" {% if request.GET.category == 'guides' %}selected{% endif %}>Guides</option>
+            <option value="tarot" {% if request.GET.category == 'tarot' %}selected{% endif %}>Tarot & Oracle</option>
+            <option value="crystals" {% if request.GET.category == 'crystals' %}selected{% endif %}>Crystals</option>
+            <option value="jewelry" {% if request.GET.category == 'jewelry' %}selected{% endif %}>Jewelry</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Price</label>
+          <select name="price" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <option value="">All Prices</option>
+            <option value="under-10" {% if request.GET.price == 'under-10' %}selected{% endif %}>Under $10</option>
+            <option value="10-25" {% if request.GET.price == '10-25' %}selected{% endif %}>$10-25</option>
+            <option value="25-50" {% if request.GET.price == '25-50' %}selected{% endif %}>$25-50</option>
+            <option value="over-50" {% if request.GET.price == 'over-50' %}selected{% endif %}>$50+</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
+          <select name="type" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            <option value="">All Types</option>
+            <option value="digital" {% if request.GET.type == 'digital' %}selected{% endif %}>Digital</option>
+            <option value="physical" {% if request.GET.type == 'physical' %}selected{% endif %}>Physical</option>
+          </select>
+        </div>
+        <div class="flex items-end">
+          <button type="submit" class="w-full px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+            Filter
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {% for product in products %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+          <!-- Image -->
+          <div class="h-48 bg-gray-200 flex items-center justify-center">
+            <div class="text-4xl">📚</div>
+          </div>
+
+          <!-- Content -->
+          <div class="p-4">
+            <h3 class="font-semibold text-gray-900 text-lg">{{ product.name }}</h3>
+            <p class="text-sm text-gray-600 mt-1">{{ product.description|truncatewords:15 }}</p>
+            
+            <div class="mt-4 flex items-center justify-between">
+              <div>
+                <div class="text-xs text-gray-600">Price</div>
+                <div class="text-2xl font-bold text-gray-900">${{ product.price|floatformat:2 }}</div>
+              </div>
+              <div>
+                <span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded font-medium">
+                  {% if product.type == 'digital' %}🔒 Digital{% else %}📦 Physical{% endif %}
+                </span>
+              </div>
+            </div>
+
+            <a href="{% url 'product_detail' product.id %}" class="mt-4 block w-full px-4 py-2 text-center text-white bg-blue-600 rounded-lg hover:bg-blue-700 font-medium">
+              View Details
+            </a>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-span-full text-center py-12">
+          <p class="text-gray-600 text-lg">No products found</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if products.has_other_pages %}
+      <div class="mt-8 flex justify-center gap-2">
+        {% if products.has_previous %}
+          <a href="?page=1" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">First</a>
+          <a href="?page={{ products.previous_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
+        {% endif %}
+
+        <span class="px-4 py-2 text-gray-600">Page {{ products.number }} of {{ products.paginator.num_pages }}</span>
+
+        {% if products.has_next %}
+          <a href="?page={{ products.next_page_number }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
+          <a href="?page={{ products.paginator.num_pages }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Last</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

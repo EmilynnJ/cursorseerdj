@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}{{ reader.user.get_full_name|default:reader.slug }} - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <div class="flex flex-col md:flex-row gap-8">
+    <div>
+      {% if reader.avatar_url %}
+      <img src="{{ reader.avatar_url }}" alt="" class="w-48 h-48 rounded-full object-cover border-2 border-soulseer-pink/50">
+      {% else %}
+      <div class="w-48 h-48 rounded-full bg-soulseer-pink/20 flex items-center justify-center font-heading text-5xl text-soulseer-pink">{{ reader.user.get_full_name|slice:":1"|default:"?" }}</div>
+      {% endif %}
+      {% if reader.is_verified %}<span class="text-sm text-soulseer-pink">Verified</span>{% endif %}
+    </div>
+    <div class="flex-1">
+      <h1 class="font-heading text-5xl text-soulseer-pink mb-4">{{ reader.user.get_full_name|default:reader.slug }}</h1>
+      <p class="font-body text-lg text-white/90 whitespace-pre-wrap">{{ reader.bio }}</p>
+      {% if reader.get_specialties_list %}
+      <p class="mt-4 text-soulseer-pink/80">Specialties: {{ reader.get_specialties_list|join:", " }}</p>
+      {% endif %}
+      <h2 class="font-body text-xl text-white/90 mt-8 mb-2">Rates</h2>
+      <ul class="space-y-2">
+        {% for rate in reader.rates.all %}
+        <li>{{ rate.modality|title }}: ${{ rate.rate_per_minute }}/min</li>
+        {% endfor %}
+      </ul>
+      {% if avg_rating %}<p class="text-soulseer-pink/80">★ {{ avg_rating|floatformat:1 }} ({{ review_count }} reviews)</p>{% endif %}
+      <h3 class="font-body text-lg mt-6 mb-2">Reviews</h3>
+      {% for rev in reviews %}
+      <p class="text-white/80 text-sm">{{ rev.rating }}★ — {{ rev.body|truncatewords:15 }} — {{ rev.client.get_full_name|default:"Client" }}</p>
+      {% empty %}
+      <p class="text-white/60">No reviews yet.</p>
+      {% endfor %}
+      <div class="mt-8 flex flex-wrap gap-4">
+        <a href="{% url 'session_create' reader.pk %}" class="px-6 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Request Reading</a>
+        <a href="{% url 'book_reader' reader.slug %}" class="px-6 py-3 rounded bg-soulseer-darker text-white border border-soulseer-pink/50 hover:bg-soulseer-pink/20 transition">Schedule</a>
+        <a href="{% url 'start_conversation' reader.user_id %}" class="px-6 py-3 rounded bg-soulseer-darker text-white border border-soulseer-pink/50 hover:bg-soulseer-pink/20 transition">Message</a>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'toggle_favorite' reader.slug %}" class="inline">{% csrf_token %}<button type="submit" class="px-6 py-3 rounded border {% if is_favorite %}border-soulseer-pink text-soulseer-pink{% else %}border-soulseer-pink/50 text-white/80{% endif %} hover:bg-soulseer-pink/20 transition">{% if is_favorite %}♥ Favorited{% else %}♡ Add to Favorites{% endif %}</button></form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Orders - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">My Orders</h1>
+  <div class="space-y-4">
+    {% for o in orders %}
+    <div class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <p class="text-white/70">{{ o.created_at|date:"M d, Y" }} - {{ o.status }}</p>
+      {% for item in o.items.all %}
+      <p>{{ item.product.name }} × {{ item.quantity }} - ${{ item.product.price|floatformat:2 }}{% if item.delivery_url %} <a href="{{ item.delivery_url }}" class="text-soulseer-pink">Download</a>{% endif %}</p>
+      {% endfor %}
+    </div>
+    {% empty %}
+    <p class="font-body text-white/70">No orders yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

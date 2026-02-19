@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Reader Dashboard - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Reader Dashboard</h1>
+
+  <div class="grid gap-8 md:grid-cols-3 mb-8">
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-xl text-soulseer-pink mb-2">Earnings</h2>
+      <p class="text-2xl text-white">${{ earnings|floatformat:2 }}</p>
+    </section>
+  </div>
+
+  <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+    <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Session History</h2>
+    <div class="space-y-2">
+      {% for s in sessions %}
+      <p class="font-body text-white/80">{{ s.client.get_full_name|default:s.client.username }} — {{ s.modality }} — {{ s.state }} — {{ s.billing_minutes }} min — {{ s.created_at|date:"M d" }}</p>
+      {% empty %}
+      <p class="text-white/60">No sessions yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="mt-8 flex gap-4">
+    <a href="{% url 'reader_availability' %}" class="px-6 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Availability</a>
+    <a href="{% url 'reader_rates' %}" class="px-6 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Rate Settings</a>
+  </div>
+</div>
+{% endblock %}

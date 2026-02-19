@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Messages - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Messages</h1>
+  <div class="space-y-4">
+    {% for c in conversations %}
+    <a href="{% url 'conversation_detail' c.pk %}" class="block p-4 rounded border border-soulseer-pink/30 bg-soulseer-darker/50 hover:border-soulseer-pink/60 transition">
+      <p class="font-body text-white/90">
+        {% if user == c.client %}{{ c.reader.get_full_name|default:c.reader.username }}{% else %}{{ c.client.get_full_name|default:c.client.username }}{% endif %}
+      </p>
+      <p class="text-sm text-white/60">{{ c.updated_at|date:"M d, Y" }}</p>
+    </a>
+    {% empty %}
+    <p class="font-body text-white/70">No conversations yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

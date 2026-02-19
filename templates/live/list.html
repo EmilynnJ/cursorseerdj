@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}Live Streams - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Live Streams</h1>
+  <p class="font-body text-lg text-white/80 mb-8">Watch live psychic readings and send gifts.</p>
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for s in streams %}
+    <a href="{% url 'stream_view' s.pk %}" class="block p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50 hover:border-soulseer-pink/60 transition">
+      <h3 class="font-heading text-2xl text-soulseer-pink">{{ s.title }}</h3>
+      <p class="font-body text-white/70">{{ s.reader.get_full_name|default:s.reader.username }}</p>
+    </a>
+    {% empty %}
+    <p class="font-body text-white/70 col-span-full">No live streams.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

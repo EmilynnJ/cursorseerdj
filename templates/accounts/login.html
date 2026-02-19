@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Login - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8 text-center">Welcome</h1>
+  <p class="font-body text-center text-white/80 mb-8">Sign in to access your SoulSeer account.</p>
+  <div class="text-center">
+    {% if auth0_configured %}
+    <p class="text-white/80 mb-4">Redirecting to Auth0...</p>
+    <a href="{% url 'login' %}" class="inline-block px-8 py-4 rounded bg-soulseer-pink/20 text-soulseer-pink border-2 border-soulseer-pink font-body hover:bg-soulseer-pink/30 transition">
+      Login with Auth0
+    </a>
+    {% else %}
+    <p class="text-amber-400/90 mb-4">Auth0 is not configured. Set AUTH0_DOMAIN, AUTH0_APP_ID, and AUTH0_CLIENT_SECRET in .env</p>
+    <a href="{% url 'login' %}" class="inline-block px-8 py-4 rounded bg-soulseer-pink/20 text-soulseer-pink border-2 border-soulseer-pink font-body hover:bg-soulseer-pink/30 transition">
+      Try Login
+    </a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

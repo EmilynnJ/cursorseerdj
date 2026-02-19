@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SoulSeer{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            soulseer: {
+              pink: '#FF69B4',
+              gold: '#D4AF37',
+              dark: '#0a0a0f',
+              darker: '#050508',
+            }
+          },
+          fontFamily: {
+            heading: ['Alex Brush', 'cursive'],
+            body: ['Playfair Display', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Playfair Display', serif; }
+    .font-heading { font-family: 'Alex Brush', cursive; }
+    .text-soulseer-pink { color: #FF69B4; }
+    .bg-soulseer-dark { background-color: #0a0a0f; }
+    .bg-soulseer-darker { background-color: #050508; }
+    .border-soulseer-pink { border-color: #FF69B4; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-soulseer-dark text-white min-h-screen antialiased">
+  <div class="min-h-screen flex flex-col">
+    {% include 'partials/nav.html' %}
+    <main class="flex-1">
+      {% block content %}{% endblock %}
+    </main>
+    {% include 'partials/footer.html' %}
+  </div>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

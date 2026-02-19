@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block title %}Settings - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Settings</h1>
+  <div class="space-y-6">
+    <div class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-body text-xl text-white mb-4">Data & Privacy</h2>
+      <a href="{% url 'data_export' %}" class="inline-block px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Export my data (GDPR)</a>
+    </div>
+    <div class="p-6 rounded border border-red-500/30 bg-soulseer-darker/50">
+      <h2 class="font-body text-xl text-red-400 mb-4">Danger Zone</h2>
+      <a href="{% url 'delete_account' %}" class="inline-block px-4 py-2 rounded bg-red-900/30 text-red-400 border border-red-500/50 hover:bg-red-900/50 transition">Delete my account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

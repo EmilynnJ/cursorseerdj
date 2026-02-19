@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}{{ stream.title }} - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">{{ stream.title }}</h1>
+  <p class="font-body text-white/80">{{ stream.reader.get_full_name|default:stream.reader.username }}</p>
+  <div class="mt-8 p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+    <p class="text-white/70 mb-4">Video player placeholder - Agora livestream</p>
+    {% if user.is_authenticated and gifts %}
+    <form method="post" action="{% url 'send_gift' stream.pk %}" class="flex gap-4 flex-wrap">
+      {% csrf_token %}
+      {% for g in gifts %}
+      <button type="submit" name="gift_id" value="{{ g.pk }}" class="px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">
+        {{ g.name }} - ${{ g.price }}
+      </button>
+      {% endfor %}
+    </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

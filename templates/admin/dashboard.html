@@ -1,0 +1,13 @@
+{% extends 'admin/base_site.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h1>SoulSeer Admin Dashboard</h1>
+<div class="module">
+  <table>
+    <tr><td>Total wallet balance</td><td>${{ total_balance|floatformat:2 }}</td></tr>
+    <tr><td>Sessions</td><td>{{ session_count }}</td></tr>
+    <tr><td>Readers</td><td>{{ reader_count }}</td></tr>
+    <tr><td>Pending flags</td><td>{{ pending_flags }}</td></tr>
+  </table>
+</div>
+{% endblock %}

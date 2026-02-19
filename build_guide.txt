@@ -1,0 +1,1223 @@
+). 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+SoulSeer Final Production Build Guide (Feb 2026, Django Monolith Version) 
+
+ 
+
+0) Objective 
+
+ 
+
+Build the production-ready, app-store deployable SoulSeer platform. This is not a demo, MVP, or scaffold. It must be secure, fully functional, and deployable. 
+
+ 
+
+Strict Directive: No Mock Anything 
+
+ 
+
+No placeholders, mock data, dummy logic, stubs, or simulated integrations. 
+
+ 
+
+No hardcoded “fake” profiles, fake sessions, fake Stripe events, or “coming soon” UI. 
+
+ 
+
+All flows must be real, end-to-end. 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+1) Product Overview 
+
+ 
+
+SoulSeer is a premium platform connecting spiritual readers with clients for: 
+
+ 
+
+On-demand pay-per-minute sessions (text/voice/video) 
+
+ 
+
+Scheduled flat-rate sessions 
+
+ 
+
+Livestreaming + gifting 
+
+ 
+
+Marketplace (digital + physical) 
+
+ 
+
+Messaging + community 
+
+ 
+
+Role-based dashboards for Client / Reader / Admin 
+
+ 
+
+ 
+
+About Page Copy (must use verbatim) 
+
+ 
+
+> At SoulSeer, we are dedicated to providing ethical, compassionate, and judgment-free spiritual guidance. Our mission is twofold: to offer clients genuine, heart-centered readings and to uphold fair, ethical standards for our readers. 
+
+Founded by psychic medium Emilynn, SoulSeer was created as a response to the corporate greed that dominates many psychic platforms. Unlike other apps, our readers keep the majority of what they earn and play an active role in shaping the platform. 
+
+SoulSeer is more than just an app—it's a soul tribe. A community of gifted psychics united by our life's calling: to guide, heal, and empower those who seek clarity on their journey. 
+
+ 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+2) Design System (Must Match Brand) 
+
+ 
+
+Theme 
+
+ 
+
+Dark-mode default 
+
+ 
+
+Palette: pink/black/gold/white 
+
+ 
+
+Celestial, mystical, ethereal (professional, not cartoonish) 
+
+ 
+
+ 
+
+Typography 
+
+ 
+
+Headings: Alex Brush in pink (#FF69B4 or very close) 
+
+ 
+
+Body: Playfair Display 
+
+ 
+
+Body text: white on dark, black on light 
+
+ 
+
+Buttons/menus must use the same typography system 
+
+ 
+
+ 
+
+Images (use these exact URLs) 
+
+ 
+
+Background: https://i.postimg.cc/sXdsKGTK/DALL-E-2025-.6-o6-14-56-29-A-vivid-ethereal-background-image-design-for-a-psychic-reading-app.webp 
+
+ 
+
+Hero: https://i.postimg.cc/tRLSgCPb/HERO-IMAGE-1.jpg 
+
+ 
+
+Founder: https://i.postimg.cc/s2ds9RtC/FOUNDER.jpg 
+
+ 
+
+ 
+
+UI Requirements 
+
+ 
+
+Accessibility: contrast, focus states, ARIA labels 
+
+ 
+
+Smooth subtle animations 
+
+ 
+
+No galaxy/stars overload. Elegant celestial accents only. 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+3) Architecture Decision (Simplified, Low-Ops, Production) 
+
+ 
+
+Core Principle 
+
+ 
+
+Minimize moving parts. Use a Django monolith and managed realtime services. 
+
+ 
+
+Required Stack (Final) 
+
+ 
+
+Backend 
+
+ 
+
+Django (monolith) 
+
+ 
+
+Django REST Framework (only where needed: mobile clients, external service callbacks, internal APIs) 
+
+ 
+
+Celery for background jobs (payout batching, webhook processing, session finalization) 
+
+ 
+
+Redis for Celery broker/cache 
+
+ 
+
+ 
+
+Frontend 
+
+ 
+
+Django Templates + Tailwind CSS 
+
+ 
+
+HTMX for dynamic UX (filters, inbox updates, dashboards, modals) 
+
+ 
+
+Alpine.js only if truly needed for small UI behaviors 
+
+ 
+
+ 
+
+Database 
+
+ 
+
+Neon Postgres (primary DB) 
+
+ 
+
+ 
+
+Auth Choose ONE: 
+
+ 
+
+Option A: Auth0 (fastest, stable, less auth footguns) 
+
+ 
+
+Option B: Django Allauth (cheaper, full control, more work) 
+
+ 
+
+ 
+
+Realtime Media (WebRTC + Livestream) 
+
+ 
+
+Agora SDK for voice/video + livestream 
+
+ 
+
+ 
+
+Signaling / Session Sync Choose ONE (do not run two parallel systems): 
+
+ 
+
+Option A (recommended for simplicity): Agora RTM for signaling + chat events 
+
+ 
+
+Option B: Ably for signaling/state events (keep everything else the same) 
+
+ 
+
+ 
+
+Payments 
+
+ 
+
+Stripe Connect (reader payouts, platform fees) 
+
+ 
+
+Stripe Checkout / Payment Intents for wallet top-ups (no card data stored) 
+
+ 
+
+ 
+
+Storage 
+
+ 
+
+Cloudflare R2 (S3-compatible) for digital downloads + uploads 
+
+(Backblaze B2 is acceptable alternative) 
+
+ 
+
+ 
+
+Observability 
+
+ 
+
+Sentry for error tracking 
+
+ 
+
+UptimeRobot for uptime checks 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+4) Navigation Structure (Final) 
+
+ 
+
+Home 
+
+ 
+
+Readers (search/filter) 
+
+ 
+
+Reader Profile (rates, availability, reviews, schedule) 
+
+ 
+
+About 
+
+ 
+
+Live (streams) 
+
+ 
+
+Shop 
+
+ 
+
+Community (forums) 
+
+ 
+
+Messages (unified inbox) 
+
+ 
+
+Dashboard (role-based) 
+
+ 
+
+Help Center 
+
+ 
+
+Profile / Settings 
+
+ 
+
+Auth pages (login/signup/logout) 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+5) Non-Negotiable Core Systems 
+
+ 
+
+SoulSeer has 3 “pillars.” Build them in this order: 
+
+ 
+
+Pillar A: Wallet + Ledger (Must Be Bulletproof) 
+
+ 
+
+Rule: Never compute billing as “timer * rate” without ledger entries. 
+
+ 
+
+Wallet Ledger Requirements 
+
+ 
+
+Every money movement is a row: 
+
+ 
+
+top-up, session charge, gift, refund, adjustment, payout, commission 
+
+ 
+
+ 
+
+Every ledger entry has: 
+
+ 
+
+idempotency key 
+
+ 
+
+timestamps 
+
+ 
+
+references to user, session, stripe event/payment intent 
+
+ 
+
+ 
+
+Must reconcile against Stripe events 
+
+ 
+
+ 
+
+Acceptance Criteria 
+
+ 
+
+Wallet balance always equals sum(ledger) 
+
+ 
+
+Stripe webhooks are idempotent (store processed event IDs) 
+
+ 
+
+Refunds and chargebacks never corrupt balances 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+Pillar B: Session State Machine (On-Demand PPM) 
+
+ 
+
+State machine (source of truth in Django DB): 
+
+ 
+
+created → waiting → active → paused → reconnecting → ended → finalized 
+
+ 
+
+include grace windows + timeout rules 
+
+ 
+
+ 
+
+Billing 
+
+ 
+
+Deduct per minute via scheduled tick OR server-authoritative timestamps 
+
+ 
+
+Ledger entries created for each billable minute segment 
+
+ 
+
+If balance hits zero: auto-pause/end according to spec 
+
+ 
+
+ 
+
+Reconnection 
+
+ 
+
+grace period enforced 
+
+ 
+
+prevention of “disconnect fraud loops” 
+
+ 
+
+session summary recorded 
+
+ 
+
+ 
+
+Acceptance Criteria 
+
+ 
+
+Reconnect does not double-bill 
+
+ 
+
+Disconnect cannot create free minutes beyond grace 
+
+ 
+
+Session cannot end without final ledger reconciliation 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+Pillar C: Realtime Media (Agora) 
+
+ 
+
+Client joins Agora channel only when session is valid and funded 
+
+ 
+
+Tokens are short-lived, generated server-side 
+
+ 
+
+Livestream uses Agora streaming mode (public/private/premium) 
+
+ 
+
+ 
+
+Acceptance Criteria 
+
+ 
+
+No valid token without session authorization 
+
+ 
+
+Stream access rules enforced (premium gating) 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+6) Feature Requirements 
+
+ 
+
+6.1 On-Demand Readings (Pay Per Minute) 
+
+ 
+
+Text, voice, video via Agora 
+
+ 
+
+Rates set by reader per modality 
+
+ 
+
+Client must have funded wallet before start 
+
+ 
+
+Auto-deduct billing per minute 
+
+ 
+
+Session summaries stored 
+
+ 
+
+ 
+
+Fraud/Edge Cases 
+
+ 
+
+rapid disconnect/reconnect loops 
+
+ 
+
+low balance mid-session 
+
+ 
+
+webhook delays 
+
+ 
+
+client tries to start without funds 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+6.2 Scheduled Readings (Flat Rate) 
+
+ 
+
+Reader sets weekly availability (repeating) 
+
+ 
+
+Client books: 
+
+ 
+
+15/30/45/60 minutes 
+
+ 
+
+ 
+
+Flat-rate charge via wallet or direct Stripe (choose one consistent method) 
+
+ 
+
+ 
+
+Acceptance Criteria 
+
+ 
+
+Booking creates a locked schedule slot 
+
+ 
+
+Cancellation/refund rules are enforceable and auditable 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+6.3 Live Streaming + Gifts 
+
+ 
+
+Public, private, premium streams 
+
+ 
+
+Gift purchases: 
+
+ 
+
+client spends wallet OR Stripe purchase that credits wallet then spends 
+
+ 
+
+ 
+
+Gifts trigger animations + ledger entry 
+
+ 
+
+Payout split: 70/30, tracked in ledger 
+
+ 
+
+ 
+
+Acceptance Criteria 
+
+ 
+
+Gift always produces ledger entry 
+
+ 
+
+Reader earnings visible and reconciled 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+6.4 Messaging (Free + Paid Reply) 
+
+ 
+
+Clients can always message readers for free 
+
+ 
+
+Reader chooses reply type each time: 
+
+ 
+
+free reply 
+
+ 
+
+paid reply (wallet charge then message delivered) 
+
+ 
+
+ 
+
+ 
+
+Acceptance Criteria 
+
+ 
+
+Paid reply cannot deliver without successful wallet deduction 
+
+ 
+
+Audit trail links reply to transaction 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+6.5 Community (Forums + Moderation) 
+
+ 
+
+Threads, replies, attachments 
+
+ 
+
+Flagging system + admin moderation queue 
+
+ 
+
+Role-based permissions 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+6.6 Shop (Stripe-Synced) 
+
+ 
+
+Digital + physical products tied to Stripe product catalog 
+
+ 
+
+Inventory sync 
+
+ 
+
+Coupons/discounts 
+
+ 
+
+Digital delivery via signed URLs (R2/S3-style) 
+
+ 
+
+ 
+
+Acceptance Criteria 
+
+ 
+
+No product sold unless present in Stripe 
+
+ 
+
+Delivery links expire + are user-specific 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+7) Role-Based Dashboards 
+
+ 
+
+Client Dashboard 
+
+ 
+
+wallet top-ups 
+
+ 
+
+transaction history 
+
+ 
+
+scheduled sessions 
+
+ 
+
+notes, favorites 
+
+ 
+
+ 
+
+Reader Dashboard 
+
+ 
+
+earnings 
+
+ 
+
+session history 
+
+ 
+
+rate settings 
+
+ 
+
+availability calendar 
+
+ 
+
+profile management 
+
+ 
+
+analytics (basic to start) 
+
+ 
+
+ 
+
+Admin Dashboard 
+
+ 
+
+reader onboarding + KYC flags 
+
+ 
+
+moderation queue 
+
+ 
+
+refunds/adjustments 
+
+ 
+
+payout control + monitoring 
+
+ 
+
+analytics + auditing 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+8) Security + Compliance Checklist (Practical Version) 
+
+ 
+
+RBAC permissions enforced server-side 
+
+ 
+
+Stripe handles PCI data (no card storage) 
+
+ 
+
+Short-lived Agora tokens 
+
+ 
+
+Secrets in environment variables only 
+
+ 
+
+Audit logging for: 
+
+ 
+
+payouts 
+
+ 
+
+refunds 
+
+ 
+
+wallet adjustments 
+
+ 
+
+admin actions 
+
+ 
+
+ 
+
+GDPR/CCPA: 
+
+ 
+
+data export 
+
+ 
+
+deletion request workflow 
+
+ 
+
+ 
+
+Rate limiting & bot protection for auth + messaging 
+
+ 
+
+Sentry + structured logs 
+
+ 
+
+ 
+
+> Note: “End-to-end encryption” must be worded carefully in public policy pages. Media encryption depends on Agora’s capabilities and configuration. Do not claim more than what you technically implement. 
+
+ 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+9) Deployment (No Docker) 
+
+ 
+
+Preferred: Heroku 
+
+ 
+
+Postgres: Neon 
+
+ 
+
+Redis add-on for Celery 
+
+ 
+
+Worker dyno for Celery 
+
+ 
+
+Web dyno for Django 
+
+ 
+
+Env vars for secrets 
+
+ 
+
+ 
+
+Alternate: Manus/Replit (only if stable for Django workers, otherwise avoid for production) 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+10) Deliverables (Required Output) 
+
+ 
+
+1. Feature list with acceptance criteria (mapped to guide sections) 
+
+ 
+
+ 
+
+2. Data model outline (ERD-friendly) 
+
+ 
+
+ 
+
+3. External integrations summary (Agora/Stripe/R2 + signaling option) 
+
+ 
+
+ 
+
+4. User journey maps (Client/Reader/Admin) 
+
+ 
+
+ 
+
+5. Security checklist + policies list 
+
+ 
+
+ 
+
+6. Deployment plan + environment variables list 
+
+ 
+
+ 
+
+7. Testing plan (unit/integration/e2e) 
+
+ 
+
+ 
+
+8. UI style tokens (colors/fonts/spacing) 
+
+ 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+11) Build Order (So You Don’t Brick Yourself) 
+
+ 
+
+1. Auth + roles + base navigation shell 
+
+ 
+
+ 
+
+2. Wallet ledger + Stripe top-ups + webhook idempotency 
+
+ 
+
+ 
+
+3. Reader profiles + rates 
+
+ 
+
+ 
+
+4. On-demand session state machine + billing tick 
+
+ 
+
+ 
+
+5. Agora integration (tokens, join/leave, reconnect) 
+
+ 
+
+ 
+
+6. Messaging (free + paid reply) 
+
+ 
+
+ 
+
+7. Scheduling 
+
+ 
+
+ 
+
+8. Livestream + gifts 
+
+ 
+
+ 
+
+9. Shop + digital delivery 
+
+ 
+
+ 
+
+10. Community forums + moderation 
+
+ 
+
+ 
+
+11. Admin analytics + alerts 
+
+ 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+12) Final “No AI Shortcut” Directive 
+
+ 
+
+If a spec is unclear: flag explicitly and propose options. 
+
+ 
+
+Never invent features or fake flows “for scaffolding.” 
+
+ 
+
+Every user journey must be tested end-to-end before moving forward. 
+
+ 
+
+ 
+
+ 
+
+--- 
+
+ 
+
+ 

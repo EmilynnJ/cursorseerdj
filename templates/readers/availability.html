@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Availability - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Set Availability</h1>
+  <p class="font-body text-white/80 mb-6">Set your weekly recurring availability. (Slot generation runs from this.)</p>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    {% for i in "1234567" %}
+    <div class="flex items-center gap-4">
+      <span class="w-24 text-white/80">{% cycle "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" "Sun" %}</span>
+      <input type="time" name="day_{{ forloop.counter0 }}_start" class="bg-soulseer-darker border border-soulseer-pink/50 rounded px-3 py-2 text-white">
+      <span class="text-white/60">to</span>
+      <input type="time" name="day_{{ forloop.counter0 }}_end" class="bg-soulseer-darker border border-soulseer-pink/50 rounded px-3 py-2 text-white">
+    </div>
+    {% endfor %}
+    <button type="submit" class="px-6 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Save</button>
+  </form>
+</div>
+{% endblock %}

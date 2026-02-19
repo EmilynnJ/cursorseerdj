@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Rate Settings - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Rate Settings</h1>
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="block text-white/80 mb-1">Text ($/min)</label>
+      <input type="number" name="rate_text" value="{{ rates.text|default:'1' }}" step="0.01" min="0" class="w-full bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white">
+    </div>
+    <div>
+      <label class="block text-white/80 mb-1">Voice ($/min)</label>
+      <input type="number" name="rate_voice" value="{{ rates.voice|default:'2' }}" step="0.01" min="0" class="w-full bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white">
+    </div>
+    <div>
+      <label class="block text-white/80 mb-1">Video ($/min)</label>
+      <input type="number" name="rate_video" value="{{ rates.video|default:'3' }}" step="0.01" min="0" class="w-full bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white">
+    </div>
+    <button type="submit" class="px-6 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Save</button>
+  </form>
+</div>
+{% endblock %}

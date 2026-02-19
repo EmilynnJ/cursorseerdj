@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Refunds & Adjustments - SoulSeer Admin{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Refunds & Adjustments</h1>
+  <a href="{% url 'admin_dashboard' %}" class="text-soulseer-pink/80 hover:text-soulseer-pink">← Admin Dashboard</a>
+  <form method="post" class="mt-8 space-y-4">
+    {% csrf_token %}
+    <div>
+      <label class="block text-white/80 mb-1">User ID</label>
+      <input type="number" name="user_id" required class="w-full bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white" placeholder="User ID" />
+    </div>
+    <div>
+      <label class="block text-white/80 mb-1">Amount</label>
+      <input type="text" name="amount" required class="w-full bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white" placeholder="e.g. 10.00" />
+    </div>
+    <div>
+      <label class="block text-white/80 mb-1">Type</label>
+      <select name="type" class="w-full bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white">
+        <option value="refund">Refund (credit wallet)</option>
+        <option value="adjustment">Adjustment (debit wallet)</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-white/80 mb-1">Reason / Reference</label>
+      <input type="text" name="reason" class="w-full bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white" placeholder="Optional reference" />
+    </div>
+    <button type="submit" class="px-6 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30">Submit</button>
+  </form>
+</div>
+{% endblock %}

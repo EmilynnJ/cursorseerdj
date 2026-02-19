@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Delete Account - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-red-400 mb-8">Delete Account</h1>
+  <p class="font-body text-white/90 mb-6">This action is irreversible. All your data will be permanently deleted.</p>
+  <form method="post" onsubmit="return confirm('Are you sure? This cannot be undone.');">
+    {% csrf_token %}
+    <button type="submit" class="px-6 py-3 rounded bg-red-900/50 text-red-400 border border-red-500 hover:bg-red-900/70 transition">Yes, delete my account</button>
+    <a href="{% url 'settings' %}" class="ml-4 text-soulseer-pink/80 hover:text-soulseer-pink">Cancel</a>
+  </form>
+</div>
+{% endblock %}

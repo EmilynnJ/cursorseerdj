@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Schedule - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Schedule a Reading</h1>
+  <p class="font-body text-lg text-white/80 mb-8">Book a flat-rate session with your reader.</p>
+  <div class="space-y-4">
+    {% for slot in slots %}
+    <div class="flex justify-between items-center p-4 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <div>
+        <p>{{ slot.reader.get_full_name|default:slot.reader.username }}</p>
+        <p class="text-sm text-white/70">{{ slot.start|date:"M d, Y H:i" }} - {{ slot.duration_minutes }} min</p>
+      </div>
+      <a href="{% url 'book_slot' slot.pk %}" class="px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Book</a>
+    </div>
+    {% empty %}
+    <p class="font-body text-white/70">No available slots.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

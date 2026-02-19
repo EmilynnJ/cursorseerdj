@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Client Dashboard - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">My Dashboard</h1>
+
+  <div class="grid gap-8 md:grid-cols-2">
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Wallet</h2>
+      <p class="text-2xl text-white">${{ wallet.balance|floatformat:2 }}</p>
+      <a href="{% url 'wallet_dashboard' %}" class="mt-2 inline-block text-soulseer-pink/80 hover:text-soulseer-pink">Top up & view history →</a>
+    </section>
+
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Scheduled Sessions</h2>
+      {% for b in bookings %}
+      <p class="font-body text-white/80">{{ b.slot.reader.get_full_name|default:b.slot.reader.username }} — {{ b.slot.start|date:"M d, H:i" }}</p>
+      {% empty %}
+      <p class="text-white/60">No upcoming sessions.</p>
+      {% endfor %}
+      <a href="{% url 'schedule' %}" class="mt-2 inline-block text-soulseer-pink/80 hover:text-soulseer-pink">View schedule →</a>
+    </section>
+  </div>
+
+  <section class="mt-8 p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+    <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Favorites</h2>
+    <div class="flex flex-wrap gap-4">
+      {% for f in favorites %}
+      <a href="{% url 'reader_profile' f.reader.slug %}" class="p-3 rounded border border-soulseer-pink/30 hover:border-soulseer-pink/60">{{ f.reader.user.get_full_name|default:f.reader.slug }}</a>
+      {% empty %}
+      <p class="text-white/60">No favorite readers yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="mt-8 p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+    <h2 class="font-heading text-2xl text-soulseer-pink mb-4">My Notes</h2>
+    {% for n in notes %}
+    <p class="font-body text-white/80 py-2 border-b border-white/10">{{ n.body|truncatewords:30 }}</p>
+    {% empty %}
+    <p class="text-white/60">No notes yet.</p>
+    {% endfor %}
+  </section>
+</div>
+{% endblock %}

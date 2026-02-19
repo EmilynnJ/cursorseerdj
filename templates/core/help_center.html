@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Help Center - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Help Center</h1>
+  <div class="space-y-6 font-body text-white/90">
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-2">Getting Started</h2>
+      <p>Create an account, add funds to your wallet, and browse readers. You can request on-demand readings or schedule flat-rate sessions.</p>
+    </section>
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-2">Wallet & Payments</h2>
+      <p>Top up your wallet via Stripe. Session charges deduct from your balance. Refunds are handled per our Terms of Service.</p>
+    </section>
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-2">Sessions</h2>
+      <p>On-demand sessions bill per minute. Ensure sufficient balance before starting. For technical issues, the session may pause—reconnect within the grace period.</p>
+    </section>
+    <section class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h2 class="font-heading text-2xl text-soulseer-pink mb-2">Contact Support</h2>
+      <p>Email support through your Dashboard or visit our <a href="{% url 'community_forum' %}" class="text-soulseer-pink hover:underline">Community</a> for help from other members.</p>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Shop - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Shop</h1>
+  <p class="font-body text-lg text-white/80 mb-8">Digital and physical products.</p>
+  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for p in products %}
+    <div class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <h3 class="font-heading text-2xl text-soulseer-pink">{{ p.name }}</h3>
+      <p class="font-body text-white/80">${{ p.price|floatformat:2 }} · {{ p.type }}</p>
+      {% if user.is_authenticated %}
+      <a href="{% url 'shop_checkout' p.pk %}" class="mt-4 inline-block px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Buy</a>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="font-body text-white/70 col-span-full">No products yet.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

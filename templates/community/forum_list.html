@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Community - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Community</h1>
+  <p class="font-body text-lg text-white/80 mb-8">Forums and discussion.</p>
+  {% for cat in categories %}
+  <div class="mb-8">
+    <h2 class="font-heading text-2xl text-soulseer-pink">{{ cat.name }}</h2>
+    {% if user.is_authenticated %}
+    <a href="{% url 'create_thread' cat.pk %}" class="text-sm text-soulseer-pink/80 hover:text-soulseer-pink">New thread</a>
+    {% endif %}
+    <div class="mt-4 space-y-2">
+      {% for t in cat.threads.all %}
+      <a href="{% url 'thread_detail' t.pk %}" class="block p-4 rounded border border-soulseer-pink/30 bg-soulseer-darker/50 hover:border-soulseer-pink/60 transition">
+        <p class="font-body text-white/90">{{ t.title }}</p>
+        <p class="text-sm text-white/60">{{ t.author.get_full_name|default:t.author.username }} · {{ t.updated_at|date:"M d" }}</p>
+      </a>
+      {% empty %}
+      <p class="text-white/60">No threads.</p>
+      {% endfor %}
+    </div>
+  </div>
+  {% empty %}
+  <p class="font-body text-white/70">No categories yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

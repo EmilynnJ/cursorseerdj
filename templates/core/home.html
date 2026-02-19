@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}SoulSeer - Ethical Spiritual Guidance{% endblock %}
+{% block content %}
+<div class="relative min-h-[80vh] flex items-center justify-center overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <img src="https://i.postimg.cc/sXdsKGTK/DALL-E-2025-.6-o6-14-56-29-A-vivid-ethereal-background-image-design-for-a-psychic-reading-app.webp" 
+         alt="" class="w-full h-full object-cover opacity-30">
+    <div class="absolute inset-0 bg-soulseer-dark/70"></div>
+  </div>
+  <div class="relative z-10 text-center max-w-4xl px-4">
+    <h1 class="font-heading text-6xl md:text-8xl text-soulseer-pink mb-4">SoulSeer</h1>
+    <p class="font-body text-xl md:text-2xl text-white/90 mb-8">
+      Ethical, compassionate, and judgment-free spiritual guidance
+    </p>
+    <img src="https://i.postimg.cc/tRLSgCPb/HERO-IMAGE-1.jpg" alt="SoulSeer" class="mx-auto rounded-lg shadow-2xl max-w-md mb-8 border border-soulseer-pink/30">
+    <a href="{% url 'reader_list' %}" class="inline-block px-8 py-4 rounded bg-soulseer-pink/20 text-soulseer-pink border-2 border-soulseer-pink font-body text-lg hover:bg-soulseer-pink/30 transition">
+      Find a Reader
+    </a>
+  </div>
+</div>
+{% endblock %}

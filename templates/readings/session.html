@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load humanize static %}
+{% block title %}Session - SoulSeer{% endblock %}
+{% block extra_head %}
+<script src="{% static 'vendor/agora/AgoraRTC_N-4.24.2.js' %}"></script>
+{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Reading Session</h1>
+  <p class="font-body text-lg text-white/80">Session {{ session.pk }} - {{ session.modality|title }} - {{ session.state }}</p>
+  <p class="font-body text-white/70">Billing: {{ session.billing_minutes }} min @ ${{ session.rate_per_minute }}/min</p>
+  {% csrf_token %}
+  <div id="agora-container" class="mt-8">
+    <div id="local-player" class="w-64 h-48 bg-soulseer-darker rounded border border-soulseer-pink/30"></div>
+    <div id="remote-playerlist" class="mt-4 grid gap-4 md:grid-cols-2"></div>
+    <div class="mt-4">
+      <button id="join-btn" class="px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30">Join Channel</button>
+      <button id="leave-btn" class="ml-2 px-4 py-2 rounded bg-red-900/30 text-red-400 border border-red-500/50 hover:bg-red-900/50" disabled>Leave</button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+(function() {
+  const sessionId = {{ session.pk }};
+  const appId = '{{ AGORA_APP_ID|default:"" }}';
+  if (!appId) { document.getElementById('agora-container').innerHTML = '<p class="text-amber-400">Agora not configured</p>'; return; }
+  const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+  let localTracks = { video: null, audio: null };
+  const joinBtn = document.getElementById('join-btn');
+  const leaveBtn = document.getElementById('leave-btn');
+  joinBtn.onclick = async function() {
+    joinBtn.disabled = true;
+    try {
+      const r = await fetch('/api/sessions/' + sessionId + '/agora-token/', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '', 'Content-Type': 'application/json' },
+        credentials: 'same-origin'
+      });
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || 'Failed');
+      const { token, channel, uid } = data;
+      [localTracks.audio, localTracks.video] = await AgoraRTC.createMicrophoneAndCameraTracks();
+      await client.join(appId, channel, token, uid);
+      await client.publish([localTracks.audio, localTracks.video]);
+      localTracks.video.play('local-player');
+      leaveBtn.disabled = false;
+    } catch (e) {
+      alert(e.message);
+      joinBtn.disabled = false;
+    }
+  };
+  leaveBtn.onclick = async function() {
+    await client.leave();
+    localTracks.audio?.close(); localTracks.video?.close();
+    leaveBtn.disabled = true;
+    joinBtn.disabled = false;
+  };
+})();
+</script>
+{% endblock %}

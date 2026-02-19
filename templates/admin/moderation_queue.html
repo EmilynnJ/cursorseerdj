@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Moderation Queue - SoulSeer Admin{% endblock %}
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Moderation Queue</h1>
+  <a href="{% url 'admin_dashboard' %}" class="text-soulseer-pink/80 hover:text-soulseer-pink">← Admin Dashboard</a>
+  <div class="mt-8 space-y-4">
+    {% for flag in flags %}
+    <div class="p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50">
+      <p class="text-white/80">{{ flag.content_type }} #{{ flag.object_id }} — reported by {{ flag.reporter.get_full_name|default:flag.reporter.username }}</p>
+      <p class="text-white/90 mt-2">{{ flag.reason }}</p>
+      <div class="mt-4 flex gap-4">
+        <form method="post" action="{% url 'resolve_flag' flag.pk %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="px-4 py-2 rounded bg-green-600/80 hover:bg-green-600 text-white">Resolve</button>
+        </form>
+        <form method="post" action="{% url 'dismiss_flag' flag.pk %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30">Dismiss</button>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-white/70">No pending flags.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

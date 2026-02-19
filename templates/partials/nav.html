@@ -1,0 +1,26 @@
+<nav class="bg-soulseer-darker/90 backdrop-blur border-b border-soulseer-pink/20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <a href="{% url 'home' %}" class="font-heading text-3xl text-soulseer-pink hover:opacity-90 transition">SoulSeer</a>
+      <div class="flex items-center gap-6 font-body">
+        <a href="{% url 'home' %}" class="hover:text-soulseer-pink transition">Home</a>
+        <a href="{% url 'reader_list' %}" class="hover:text-soulseer-pink transition">Readers</a>
+        <a href="{% url 'about' %}" class="hover:text-soulseer-pink transition">About</a>
+        <a href="{% url 'live_list' %}" class="hover:text-soulseer-pink transition">Live</a>
+        <a href="{% url 'shop_list' %}" class="hover:text-soulseer-pink transition">Shop</a>
+        <a href="{% url 'community_forum' %}" class="hover:text-soulseer-pink transition">Community</a>
+        <a href="{% url 'messages_inbox' %}" class="hover:text-soulseer-pink transition">Messages</a>
+        <a href="{% url 'schedule' %}" class="hover:text-soulseer-pink transition">Schedule</a>
+        <a href="{% url 'dashboard' %}" class="hover:text-soulseer-pink transition">Dashboard</a>
+        <a href="{% url 'help' %}" class="hover:text-soulseer-pink transition">Help</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" class="hover:text-soulseer-pink transition">Profile</a>
+          <a href="{% url 'logout' %}" class="text-sm opacity-80 hover:text-soulseer-pink transition">Logout</a>
+        {% else %}
+          <a href="{% url 'login' %}" class="hover:text-soulseer-pink transition">Login</a>
+          <a href="{% url 'signup' %}" class="px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink/50 hover:bg-soulseer-pink/30 transition">Sign Up</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>

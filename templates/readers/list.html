@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Readers - SoulSeer{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Find a Reader</h1>
+  <form method="get" class="flex gap-4 mb-8">
+    <input type="text" name="specialty" value="{{ specialty_filter }}" placeholder="Specialty" class="bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white">
+    <select name="modality" class="bg-soulseer-darker border border-soulseer-pink/50 rounded px-4 py-2 text-white">
+      <option value="">All modalities</option>
+      <option value="text" {% if modality_filter == 'text' %}selected{% endif %}>Text</option>
+      <option value="voice" {% if modality_filter == 'voice' %}selected{% endif %}>Voice</option>
+      <option value="video" {% if modality_filter == 'video' %}selected{% endif %}>Video</option>
+    </select>
+    <button type="submit" class="px-4 py-2 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Filter</button>
+  </form>
+  <div id="reader-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    {% for r in readers %}
+    <a href="{% url 'reader_profile' r.slug %}" class="block p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50 hover:border-soulseer-pink/60 transition">
+      {% if r.avatar_url %}
+      <img src="{{ r.avatar_url }}" alt="" class="w-24 h-24 rounded-full object-cover mb-4">
+      {% else %}
+      <div class="w-24 h-24 rounded-full bg-soulseer-pink/20 flex items-center justify-center mb-4 font-heading text-2xl text-soulseer-pink">{{ r.user.get_full_name|slice:":1"|default:"?" }}</div>
+      {% endif %}
+      <h3 class="font-heading text-2xl text-soulseer-pink">{{ r.user.get_full_name|default:r.slug }}</h3>
+      <p class="font-body text-sm text-white/70 line-clamp-2">{{ r.bio|truncatewords:20 }}</p>
+      <div class="mt-2 text-sm text-soulseer-pink/80">
+        {% for rate in r.rates.all %}
+        <span>{{ rate.modality }} ${{ rate.rate_per_minute }}/min</span>{% if not forloop.last %} · {% endif %}
+        {% endfor %}
+      </div>
+    </a>
+    {% empty %}
+    <p class="font-body text-white/70 col-span-full">No readers found.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

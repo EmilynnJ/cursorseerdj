@@ -79,27 +79,25 @@
       "description": "Detected: No LICENSE file"
     }
   ],
-  "lastUpdated": "2026-02-19T18:36:41.831Z",
-  "lastSignalHash": "has-docker:true|has-ci:false|no-ci:true|no-tests:true|no-env-example:false|has-prisma:false|has-drizzle:false|large-bundle:false|no-license:true",
+  "lastUpdated": "2026-02-19T21:08:27.407Z",
+  "lastSignalHash": "has-docker:false|has-ci:true|no-ci:false|no-tests:false|no-env-example:false|has-prisma:false|has-drizzle:false|large-bundle:false|no-license:true",
   "projectSignals": [
     {
       "type": "has-docker",
-      "detected": true,
-      "detail": "Docker config found"
-    },
-    {
-      "type": "has-ci",
       "detected": false
     },
     {
-      "type": "no-ci",
+      "type": "has-ci",
       "detected": true,
-      "detail": "No CI/CD config detected"
+      "detail": "GitHub Actions found"
+    },
+    {
+      "type": "no-ci",
+      "detected": false
     },
     {
       "type": "no-tests",
-      "detected": true,
-      "detail": "No test directory found"
+      "detected": false
     },
     {
       "type": "no-env-example",

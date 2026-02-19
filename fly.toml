@@ -2,7 +2,7 @@ app = "soulseer"
 primary_region = "iad"
 
 [build]
-  dockerfile = "Dockerfile"
+  builder = "paketobuildpacks/builder:base"
 
 [env]
   PORT = "8080"
@@ -47,4 +47,4 @@ primary_region = "iad"
   beat = "celery -A soulseer beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
 
 [deploy]
-  release_command = "python manage.py migrate --noinput && python manage.py collectstatic --noinput"
+  release_command = "python fly.py"

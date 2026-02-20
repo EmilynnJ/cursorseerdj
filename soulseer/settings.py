@@ -46,19 +46,17 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'readings.tasks.billing_tick',
         'schedule': 60.0,
     },
-<<<<<<< HEAD
     'finalize-sessions': {
         'task': 'readings.tasks.finalize_sessions',
-        'schedule': 300.0,  # Every 5 minutes
+        'schedule': 300.0,
     },
     'reconnect-timeout': {
         'task': 'readings.tasks.handle_reconnect_timeout',
-        'schedule': 30.0,  # Every 30 seconds
-=======
+        'schedule': 30.0,
+    },
     'expire-grace-periods': {
         'task': 'readings.tasks.expire_grace_periods',
         'schedule': 30.0,
->>>>>>> 786cda79204bf24bd3fb50381d4299beba0a7e2e
     },
 }
 CACHES = {
@@ -177,15 +175,13 @@ REST_FRAMEWORK = {
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = '/accounts/login/'
 
-# Custom user model placeholder - we'll use extended profile
-# AUTH_USER_MODEL = 'accounts.User'  # Optional if using profile extension
-
 # Sentry
 SENTRY_DSN = env('SENTRY_DSN', default='')
 if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
     sentry_sdk.init(dsn=SENTRY_DSN, integrations=[DjangoIntegration()], traces_sample_rate=0.1)
+
 # Security settings (production-ready)
 if not DEBUG:
     SECURE_SSL_REDIRECT = True

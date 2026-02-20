@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: soulseer
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn soulseer.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --worker-class gthread --timeout 60
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: DJANGO_SETTINGS_MODULE
+        value: soulseer.settings
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: soulseer-db
+          property: connectionString
+
+  - type: worker
+    name: soulseer-worker
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A soulseer worker -l info -c 2
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: soulseer.settings
+
+  - type: cron
+    name: soulseer-beat
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A soulseer beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    schedule: "*/1 * * * *"
+
+databases:
+  - name: soulseer-db
+    databaseName: soulseer
+    user: soulseer

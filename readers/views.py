@@ -47,7 +47,8 @@ def reader_availability(request):
             if start and end:
                 ReaderAvailability.objects.create(reader=rp, day_of_week=i, start_time=start, end_time=end)
         return redirect('reader_availability')
-    return render(request, 'readers/availability.html', {'reader_profile': rp, 'slots': slots})
+    days = [(0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'), (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday')]
+    return render(request, 'readers/availability.html', {'reader_profile': rp, 'slots': slots, 'days': days})
 
 
 @login_required

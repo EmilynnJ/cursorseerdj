@@ -1,18 +1,19 @@
 import secrets
+import requests as http_requests
 from django.shortcuts import render, redirect
 from django.conf import settings
 from .auth_backend import verify_auth0_token, get_or_create_user_from_token
-from django.contrib.auth import login, logout
+from django.contrib.auth import login as auth_login, logout as auth_logout
 
 
-def login(request):
+def login_view(request):
     """Redirect to Auth0 Universal Login."""
     if request.user.is_authenticated:
         return redirect('dashboard')
     return _auth0_redirect(request, screen='login')
 
 
-def signup(request):
+def signup_view(request):
     """Redirect to Auth0 signup screen."""
     if request.user.is_authenticated:
         return redirect('dashboard')
@@ -41,7 +42,7 @@ def _auth0_redirect(request, screen='login'):
 
 
 def logout_view(request):
-    logout(request)
+    auth_logout(request)
     return redirect('home')
 
 
@@ -58,29 +59,28 @@ def callback(request):
     client_id = getattr(settings, 'AUTH0_APP_ID', '').strip()
     redirect_uri = request.build_absolute_uri('/accounts/callback/')
     token_url = f"https://{domain}/oauth/token"
-    import requests
     client_secret = getattr(settings, 'AUTH0_CLIENT_SECRET', '').strip()
-    payload = {
+    post_payload = {
         'grant_type': 'authorization_code',
         'client_id': client_id,
         'code': code,
         'redirect_uri': redirect_uri,
     }
     if client_secret:
-        payload['client_secret'] = client_secret
-    resp = requests.post(token_url, json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
+        post_payload['client_secret'] = client_secret
+    resp = http_requests.post(token_url, json=post_payload, headers={'Content-Type': 'application/json'}, timeout=10)
     if resp.status_code != 200:
         return redirect('login')
     data = resp.json()
     id_token = data.get('id_token')
     if not id_token:
         return redirect('login')
-    payload = verify_auth0_token(id_token)
-    if not payload:
+    token_payload = verify_auth0_token(id_token)
+    if not token_payload:
         return redirect('login')
-    user = get_or_create_user_from_token(payload)
+    user = get_or_create_user_from_token(token_payload)
     if user:
-        login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+        auth_login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     return redirect('dashboard')
 
 
@@ -143,7 +143,7 @@ def data_export(request):
 def delete_account(request):
     if request.method == 'POST':
         user = request.user
+        auth_logout(request)
         user.delete()
-        logout(request)
         return redirect('home')
     return render(request, 'accounts/delete_confirm.html')

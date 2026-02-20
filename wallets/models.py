@@ -30,7 +30,6 @@ class Wallet(models.Model):
         return f"Wallet({self.user_id}) ${self.balance}"
 
     def balance_from_ledger(self):
-        """Sum of ledger entries - must equal self.balance."""
         from django.db.models import Sum
         total = self.entries.aggregate(s=Sum('amount'))['s'] or Decimal('0')
         return total
@@ -66,9 +65,13 @@ class LedgerEntry(models.Model):
         return f"{self.entry_type} {self.amount}"
 
 
-def debit_wallet(wallet, amount, entry_type, idempotency_key, session=None, reference_type='', reference_id=''):
-    """Debit wallet with ledger entry. Uses select_for_update for consistency."""
+def debit_wallet(wallet, amount, entry_type, idempotency_key, session=None,
+                 stripe_payment_intent_id='', stripe_event_id='',
+                 reference_type='', reference_id=''):
+    """Debit wallet with ledger entry. Idempotent on idempotency_key."""
     with transaction.atomic():
+        if LedgerEntry.objects.filter(idempotency_key=idempotency_key).exists():
+            return False
         w = Wallet.objects.select_for_update().get(pk=wallet.pk)
         if w.balance < amount:
             raise ValueError("Insufficient balance")
@@ -78,6 +81,8 @@ def debit_wallet(wallet, amount, entry_type, idempotency_key, session=None, refe
             entry_type=entry_type,
             idempotency_key=idempotency_key,
             session=session,
+            stripe_payment_intent_id=stripe_payment_intent_id,
+            stripe_event_id=stripe_event_id,
             reference_type=reference_type,
             reference_id=reference_id,
         )
@@ -86,8 +91,9 @@ def debit_wallet(wallet, amount, entry_type, idempotency_key, session=None, refe
     return True
 
 
-def credit_wallet(wallet, amount, entry_type, idempotency_key, session=None, stripe_payment_intent_id='',
-                  stripe_event_id='', reference_type='', reference_id=''):
+def credit_wallet(wallet, amount, entry_type, idempotency_key, session=None,
+                  stripe_payment_intent_id='', stripe_event_id='',
+                  reference_type='', reference_id=''):
     """Credit wallet with ledger entry. Idempotent on idempotency_key."""
     with transaction.atomic():
         if LedgerEntry.objects.filter(idempotency_key=idempotency_key).exists():

@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
   joinBtn.addEventListener('click', async function() {
     joinBtn.disabled = true;
     try {
-      const response = await fetch('/api/sessions/' + sessionId + '/agora-token/', {
+      const response = await fetch('/api/sessions/' + sessionId + '/rtc-token/', {
         method: 'POST',
         headers: { 
           'X-CSRFToken': csrfToken,

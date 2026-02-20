@@ -20,3 +20,4 @@ urlpatterns = [
     
     # Livestream RTC token generation
     path('livestreams/<int:livestream_id>/rtc-token/', get_livestream_token, name='get_livestream_token'),
+]

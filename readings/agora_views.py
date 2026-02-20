@@ -333,9 +333,14 @@ def get_livestream_token(request, livestream_id):
         
         # Check visibility
         if livestream.visibility == 'premium':
-            # TODO: Verify premium access
+            # Premium streams require authentication and a minimum wallet balance ($1.00)
             if request.user != livestream.reader:
-                pass  # In production, check subscription
+                try:
+                    wallet = Wallet.objects.get(user=request.user)
+                    if wallet.balance < 1:
+                        return JsonResponse({'error': 'Premium stream: insufficient wallet balance'}, status=402)
+                except Wallet.DoesNotExist:
+                    return JsonResponse({'error': 'Premium stream: wallet required'}, status=402)
         elif livestream.visibility == 'private':
             if request.user != livestream.reader:
                 return JsonResponse({'error': 'Private livestream'}, status=403)

@@ -39,7 +39,7 @@ def billing_tick():
 
             if wallet.balance < rate:
                 logger.info(f"Session {session.pk} low balance (${wallet.balance} < ${rate}), pausing")
-                session.grace_until = now + timezone.timedelta(minutes=2)
+                session.grace_until = now + timezone.timedelta(minutes=5)
                 session.reconnect_count += 1
                 session.transition('paused')
                 session.save(update_fields=['grace_until', 'reconnect_count'])
@@ -68,7 +68,7 @@ def billing_tick():
             session.save()
         except ValueError as e:
             logger.warning(f"Session {session.pk} insufficient balance error: {e}, pausing")
-            session.grace_until = now + timezone.timedelta(minutes=2)
+            session.grace_until = now + timezone.timedelta(minutes=5)
             session.transition('paused')
             session.save(update_fields=['grace_until'])
         except Exception as e:

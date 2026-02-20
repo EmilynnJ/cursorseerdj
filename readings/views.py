@@ -58,8 +58,8 @@ def session_disconnect(request, pk):
         return redirect('reader_list')
     
     if session.state == 'active':
-        # Enter grace period for reconnection (2 minutes)
-        session.grace_until = timezone.now() + timedelta(minutes=2)
+        # Enter grace period for reconnection (5 minutes)
+        session.grace_until = timezone.now() + timedelta(minutes=5)
         session.reconnect_count += 1
         session.transition('paused')
         session.save(update_fields=['grace_until', 'reconnect_count'])

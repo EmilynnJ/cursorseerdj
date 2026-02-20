@@ -188,6 +188,9 @@ if SENTRY_DSN:
 
 # Security settings (production-ready)
 if not DEBUG:
+    # Trust the x-forwarded-proto header set by Netlify / Fly.io / any
+    # HTTPS-terminating proxy so that SECURE_SSL_REDIRECT doesn't loop.
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True

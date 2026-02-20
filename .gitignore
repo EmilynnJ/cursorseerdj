@@ -23,3 +23,5 @@ wheels/
 .venv/
 venv/
 ENV/
+staticfiles/
+media/

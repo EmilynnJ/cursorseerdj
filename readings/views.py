@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import timedelta
-from .models import Session
+from .models import Session, SessionNote
 from readers.models import ReaderProfile, ReaderRate
 from wallets.models import Wallet
 
@@ -91,10 +91,26 @@ def session_end(request, pk):
     session = get_object_or_404(Session, pk=pk)
     if request.user != session.client and request.user != session.reader:
         return redirect('reader_list')
-    
+
     if session.state in ('active', 'paused', 'reconnecting'):
         session.ended_at = timezone.now()
         session.transition('ended')
         session.save(update_fields=['ended_at'])
-    
+
     return redirect('session_detail', pk=pk)
+
+
+@login_required
+@require_POST
+def create_note(request, session_id):
+    """Client creates a private note about a session or reader."""
+    session = get_object_or_404(Session, pk=session_id, client=request.user)
+    body = request.POST.get('body', '').strip()
+    if body:
+        SessionNote.objects.create(
+            client=request.user,
+            session=session,
+            reader=session.reader,
+            body=body,
+        )
+    return redirect('session_detail', pk=session_id)

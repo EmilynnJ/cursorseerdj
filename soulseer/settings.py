@@ -58,6 +58,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'readings.tasks.expire_grace_periods',
         'schedule': 30.0,
     },
+    'weekly-reader-payouts': {
+        'task': 'readings.tasks.payout_readers',
+        'schedule': 604800.0,  # Every 7 days
+    },
 }
 CACHES = {
     'default': {

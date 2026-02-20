@@ -76,3 +76,12 @@ def refund_adjustment(request):
         return redirect('refund_adjustment')
     users = []
     return render(request, 'admin/refund_adjustment.html', {'users': users})
+
+
+@staff_member_required
+@require_POST
+def trigger_payouts(request):
+    """Admin manually triggers the reader payout batch task."""
+    from readings.tasks import payout_readers
+    payout_readers.delay()
+    return redirect('admin_dashboard')

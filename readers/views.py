@@ -84,3 +84,34 @@ def toggle_favorite(request, slug):
 
 def book_reader(request, slug):
     return redirect('schedule')
+
+
+@login_required
+def stripe_connect_onboard(request):
+    """Initiate Stripe Connect onboarding for a reader to receive payouts."""
+    import stripe
+    from django.conf import settings
+    rp = getattr(request.user, 'reader_profile', None)
+    if not rp:
+        return redirect('profile')
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    if rp.stripe_connect_account_id:
+        # Already has account — generate new onboarding link
+        account_id = rp.stripe_connect_account_id
+    else:
+        account = stripe.Account.create(
+            type='express',
+            email=request.user.email or None,
+            metadata={'user_id': str(request.user.id)},
+        )
+        account_id = account.id
+        rp.stripe_connect_account_id = account_id
+        rp.save(update_fields=['stripe_connect_account_id'])
+
+    link = stripe.AccountLink.create(
+        account=account_id,
+        refresh_url=request.build_absolute_uri('/readers/me/connect/'),
+        return_url=request.build_absolute_uri('/dashboard/reader/'),
+        type='account_onboarding',
+    )
+    return redirect(link.url)

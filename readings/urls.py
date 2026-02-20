@@ -7,4 +7,5 @@ urlpatterns = [
     path('<int:pk>/disconnect/', views.session_disconnect, name='session_disconnect'),
     path('<int:pk>/reconnect/', views.session_reconnect, name='session_reconnect'),
     path('<int:pk>/end/', views.session_end, name='session_end'),
+    path('<int:session_id>/note/', views.create_note, name='session_create_note'),
 ]

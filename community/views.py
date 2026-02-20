@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .models import ForumCategory, ForumThread, ForumPost
+from django.contrib.contenttypes.models import ContentType
+from .models import ForumCategory, ForumThread, ForumPost, Flag
 
 
 def forum_list(request):
@@ -35,3 +36,31 @@ def reply(request, thread_id):
     if body:
         ForumPost.objects.create(thread=thread, author=request.user, body=body)
     return redirect('thread_detail', pk=thread_id)
+
+
+@login_required
+@require_POST
+def flag_content(request):
+    """
+    Submit a content flag/report. Accepts content_type (app_label.model), object_id, and reason.
+    Supports flagging ForumThread, ForumPost, or any model with contenttypes framework.
+    """
+    content_type_str = request.POST.get('content_type', '').strip()
+    object_id = request.POST.get('object_id', '').strip()
+    reason = request.POST.get('reason', '').strip()
+    next_url = request.POST.get('next') or request.META.get('HTTP_REFERER') or '/'
+
+    if content_type_str and object_id and reason:
+        try:
+            app_label, model = content_type_str.split('.')
+            ct = ContentType.objects.get(app_label=app_label, model=model)
+            Flag.objects.create(
+                content_type=ct,
+                object_id=int(object_id),
+                reporter=request.user,
+                reason=reason,
+            )
+        except (ValueError, ContentType.DoesNotExist):
+            pass
+
+    return redirect(next_url)

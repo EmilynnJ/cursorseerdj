@@ -2,17 +2,67 @@
 {% block title %}Live Streams - SoulSeer{% endblock %}
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-16">
-  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">Live Streams</h1>
-  <p class="font-body text-lg text-white/80 mb-8">Watch live psychic readings and send gifts.</p>
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="font-heading text-5xl text-soulseer-pink">Live Now</h1>
+    {% if user.is_authenticated and user.profile.role == 'reader' %}
+    <button onclick="document.getElementById('go-live-modal').classList.remove('hidden')"
+      class="px-5 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition font-body">
+      Go Live
+    </button>
+    {% endif %}
+  </div>
+
   <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
     {% for s in streams %}
-    <a href="{% url 'stream_view' s.pk %}" class="block p-6 rounded border border-soulseer-pink/30 bg-soulseer-darker/50 hover:border-soulseer-pink/60 transition">
-      <h3 class="font-heading text-2xl text-soulseer-pink">{{ s.title }}</h3>
+    <a href="{% url 'stream_view' s.pk %}" class="block p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50 hover:border-soulseer-pink/60 transition">
+      <div class="flex justify-between items-start mb-2">
+        <h3 class="font-heading text-2xl text-soulseer-pink">{{ s.title }}</h3>
+        <span class="text-xs px-2 py-1 rounded-full bg-red-900/50 text-red-400 animate-pulse">● LIVE</span>
+      </div>
       <p class="font-body text-white/70">{{ s.reader.get_full_name|default:s.reader.username }}</p>
+      <p class="font-body text-white/50 text-sm mt-1 capitalize">{{ s.visibility }}</p>
     </a>
     {% empty %}
-    <p class="font-body text-white/70 col-span-full">No live streams.</p>
+    <div class="col-span-full text-center py-16">
+      <p class="font-body text-white/60 text-lg">No live streams right now.</p>
+      <p class="font-body text-white/40 text-sm mt-2">Check back soon or browse readers below.</p>
+      <a href="{% url 'reader_list' %}" class="mt-6 inline-block px-6 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition">Find a Reader</a>
+    </div>
     {% endfor %}
   </div>
 </div>
+
+<!-- Go Live Modal -->
+{% if user.is_authenticated and user.profile.role == 'reader' %}
+<div id="go-live-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div class="bg-soulseer-darker border border-soulseer-pink/30 rounded-lg p-8 max-w-md w-full mx-4">
+    <h2 class="font-heading text-3xl text-soulseer-pink mb-6">Start a Live Stream</h2>
+    <form method="post" action="{% url 'start_stream' %}" class="space-y-4">
+      {% csrf_token %}
+      <div>
+        <label class="block text-white/70 text-sm font-body mb-1">Stream Title</label>
+        <input type="text" name="title" placeholder="e.g. Evening Tarot Reading"
+          class="w-full bg-soulseer-dark border border-soulseer-pink/50 rounded px-4 py-2 text-white font-body" maxlength="255">
+      </div>
+      <div>
+        <label class="block text-white/70 text-sm font-body mb-1">Visibility</label>
+        <select name="visibility" class="w-full bg-soulseer-dark border border-soulseer-pink/50 rounded px-4 py-2 text-white font-body">
+          <option value="public">Public — Anyone can watch</option>
+          <option value="premium">Premium — Subscribers only</option>
+          <option value="private">Private — Invite only</option>
+        </select>
+      </div>
+      <div class="flex gap-4 mt-6">
+        <button type="submit" class="flex-1 px-4 py-3 rounded bg-soulseer-pink/20 text-soulseer-pink border border-soulseer-pink hover:bg-soulseer-pink/30 transition font-body">
+          Go Live
+        </button>
+        <button type="button" onclick="document.getElementById('go-live-modal').classList.add('hidden')"
+          class="flex-1 px-4 py-3 rounded border border-white/20 text-white/60 hover:text-white hover:border-white/40 transition font-body">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

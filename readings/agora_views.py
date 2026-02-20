@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 @login_required
 @require_POST
-def get_rtc_token(request):
+def get_rtc_token(request, session_id):
     """
     Generate Agora RTC token for session access.
     
@@ -38,7 +38,6 @@ def get_rtc_token(request):
     - Generate short-lived token (1200s = 20 min)
     """
     try:
-        session_id = request.POST.get('session_id')
         session = get_object_or_404(Session, pk=session_id)
         
         # Verify user is client or reader

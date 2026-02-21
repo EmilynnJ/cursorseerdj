@@ -192,14 +192,6 @@ if not DEBUG:
     SECURE_HSTS_PRELOAD = True
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
-    SECURE_CONTENT_SECURITY_POLICY = {
-        "default-src": ("'self'",),
-        "script-src": ("'self'", "cdn.jsdelivr.net", "*.agora.io", "https://js.stripe.com"),
-        "connect-src": ("'self'", "*.agora.io", "https://api.stripe.com"),
-        "style-src": ("'self'", "cdn.jsdelivr.net", "'unsafe-inline'"),
-        "img-src": ("'self'", "data:", "https:"),
-        "font-src": ("'self'", "cdn.jsdelivr.net"),
-    }
 
 # Logging
 LOGGING = {

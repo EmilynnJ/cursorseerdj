@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.conf import settings
-from agora_token_builder import RtcTokenBuilder
+from .agora_token import RtcTokenBuilder, ROLE_PUBLISHER, ROLE_SUBSCRIBER
 from .models import Session
 from wallets.models import Wallet
 
@@ -61,12 +61,14 @@ def get_rtc_token(request):
             session.save()
         
         # Generate RTC token
+        privilege_expire_ts = int(timezone.now().timestamp()) + 1200
         token = RtcTokenBuilder.build_token_with_uid(
             app_id=settings.AGORA_APP_ID,
             app_certificate=settings.AGORA_CERTIFICATE,
             channel_name=session.channel_name,
             uid=request.user.id,
-            expire_seconds=1200  # 20 minutes
+            role=ROLE_PUBLISHER,
+            privilege_expire_ts=privilege_expire_ts,
         )
         
         logger.info(f"RTC token generated for session {session_id}, user {request.user.id}")
@@ -135,12 +137,14 @@ def session_join(request, session_id):
         logger.info(f"Session {session_id} joined by user {request.user.id}")
         
         # Generate token
+        privilege_expire_ts = int(timezone.now().timestamp()) + 1200
         token = RtcTokenBuilder.build_token_with_uid(
             app_id=settings.AGORA_APP_ID,
             app_certificate=settings.AGORA_CERTIFICATE,
             channel_name=session.channel_name,
             uid=request.user.id,
-            expire_seconds=1200
+            role=ROLE_PUBLISHER,
+            privilege_expire_ts=privilege_expire_ts,
         )
         
         return JsonResponse({
@@ -234,12 +238,14 @@ def session_reconnect(request, session_id):
         logger.info(f"Session {session_id} reconnected by user {request.user.id}")
         
         # Generate new token
+        privilege_expire_ts = int(timezone.now().timestamp()) + 1200
         token = RtcTokenBuilder.build_token_with_uid(
             app_id=settings.AGORA_APP_ID,
             app_certificate=settings.AGORA_CERTIFICATE,
             channel_name=session.channel_name,
             uid=request.user.id,
-            expire_seconds=1200
+            role=ROLE_PUBLISHER,
+            privilege_expire_ts=privilege_expire_ts,
         )
         
         return JsonResponse({
@@ -338,12 +344,15 @@ def get_livestream_token(request, livestream_id):
         # Determine role: host if reader, audience if viewer
         role = 1 if request.user == livestream.reader else 0
         
+        privilege_expire_ts = int(timezone.now().timestamp()) + 3600
+        ls_role = ROLE_PUBLISHER if request.user == livestream.reader else ROLE_SUBSCRIBER
         token = RtcTokenBuilder.build_token_with_uid(
             app_id=settings.AGORA_APP_ID,
             app_certificate=settings.AGORA_CERTIFICATE,
             channel_name=livestream.agora_channel,
             uid=request.user.id,
-            expire_seconds=3600
+            role=ls_role,
+            privilege_expire_ts=privilege_expire_ts,
         )
         
         return JsonResponse({

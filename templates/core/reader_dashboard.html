@@ -1,187 +1,138 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load humanize %}
-
 {% block title %}Reader Dashboard - SoulSeer{% endblock %}
-
 {% block content %}
-<div class="min-h-screen bg-gray-50 py-12">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    
-    <!-- Page Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">Reader Dashboard</h1>
-      <p class="mt-2 text-gray-600">{{ request.user.profile.display_name }} • {{ reader_profile.specialties }}</p>
-    </div>
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <h1 class="font-heading text-5xl text-soulseer-pink mb-2">Reader Dashboard</h1>
+  <p class="font-body text-white/60 mb-10">{{ request.user.profile.display_name|default:request.user.first_name }}</p>
 
-    <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
-      
-      <!-- Left Column: Main Content -->
-      <div class="md:col-span-2">
-        
-        <!-- Earnings Overview -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Earnings This Month</h2>
-          <div class="grid grid-cols-3 gap-4 mb-6">
-            <div>
-              <div class="text-sm text-gray-600">Session Income</div>
-              <div class="text-2xl font-bold text-green-600">${{ session_income|floatformat:2 }}</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-600">Gift Commission</div>
-              <div class="text-2xl font-bold text-blue-600">${{ commission_income|floatformat:2 }}</div>
-            </div>
-            <div>
-              <div class="text-sm text-gray-600">Total Earned</div>
-              <div class="text-2xl font-bold text-purple-600">${{ total_earnings|floatformat:2 }}</div>
-            </div>
+  <div class="grid gap-8 md:grid-cols-3">
+    <div class="md:col-span-2 space-y-8">
+
+      <!-- Earnings -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50">
+        <h2 class="font-heading text-2xl text-soulseer-pink mb-6">Earnings</h2>
+        <div class="grid gap-4 grid-cols-3">
+          <div class="text-center">
+            <p class="text-white/60 text-xs font-body uppercase tracking-wider">Session</p>
+            <p class="text-2xl font-bold text-green-400">${{ session_earnings|floatformat:2 }}</p>
           </div>
-          <div class="border-t pt-4">
-            <div class="flex justify-between items-center">
-              <div class="text-sm text-gray-600">Available for Payout</div>
-              <div class="text-xl font-semibold text-gray-900">${{ payout_available|floatformat:2 }}</div>
-            </div>
-            <a href="{% url 'request_payout' %}" class="mt-4 inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-              Request Payout
-            </a>
+          <div class="text-center">
+            <p class="text-white/60 text-xs font-body uppercase tracking-wider">Gifts</p>
+            <p class="text-2xl font-bold text-blue-400">${{ gift_earnings|floatformat:2 }}</p>
+          </div>
+          <div class="text-center">
+            <p class="text-white/60 text-xs font-body uppercase tracking-wider">Total</p>
+            <p class="text-2xl font-bold text-soulseer-pink">${{ total_earnings|floatformat:2 }}</p>
           </div>
         </div>
+      </section>
 
-        <!-- Session History -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Sessions</h2>
-          {% if recent_sessions %}
-            <div class="space-y-4">
-              {% for session in recent_sessions %}
-                <div class="flex justify-between items-start py-4 border-b border-gray-200 last:border-b-0">
-                  <div class="flex-1">
-                    <div class="font-medium text-gray-900">
-                      {{ session.client.profile.display_name }}
-                    </div>
-                    <div class="text-sm text-gray-600 mt-1">
-                      {{ session.started_at|date:"M d, Y H:i" }} • {{ session.modality|title }} ({{ session.billing_minutes }} min)
-                    </div>
-                    <div class="mt-2 text-sm">
-                      <span class="inline-block px-2 py-1 bg-gray-100 text-gray-800 rounded">{{ session.get_state_display }}</span>
-                    </div>
-                  </div>
-                  <div class="text-right">
-                    <div class="font-semibold text-green-600">${{ session.rate_per_minute|add:session.billing_minutes|floatformat:2 }}</div>
-                    {% if session.reviews %}
-                      <div class="mt-2 text-sm text-yellow-500">
-                        ⭐ {{ session.reviews.first.rating }}/5
-                      </div>
-                    {% endif %}
-                  </div>
-                </div>
-              {% endfor %}
+      <!-- Session History -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50">
+        <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Recent Sessions</h2>
+        {% for session in sessions %}
+        <div class="py-4 border-b border-white/10 last:border-0 font-body">
+          <a href="{% url 'session_detail' session.pk %}" class="flex justify-between hover:text-soulseer-pink transition">
+            <div>
+              <p class="text-white">{{ session.client.get_full_name|default:session.client.username }}</p>
+              <p class="text-white/50 text-xs">{{ session.modality|title }} • {{ session.billing_minutes }} min • {{ session.started_at|date:"M d, Y" }}</p>
             </div>
-          {% else %}
-            <p class="text-gray-600 text-center py-8">No sessions yet</p>
-          {% endif %}
-        </div>
-
-        <!-- Rates Management -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Your Rates</h2>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="border border-gray-200 rounded-lg p-4">
-              <div class="font-medium text-gray-900 mb-2">Text</div>
-              <div class="text-2xl font-bold text-blue-600">${{ text_rate|default:"0.00" }}/min</div>
-              <a href="{% url 'edit_rate' 'text' %}" class="mt-3 text-blue-600 hover:text-blue-800 text-sm font-medium">Edit →</a>
-            </div>
-            <div class="border border-gray-200 rounded-lg p-4">
-              <div class="font-medium text-gray-900 mb-2">Voice</div>
-              <div class="text-2xl font-bold text-green-600">${{ voice_rate|default:"0.00" }}/min</div>
-              <a href="{% url 'edit_rate' 'voice' %}" class="mt-3 text-green-600 hover:text-green-800 text-sm font-medium">Edit →</a>
-            </div>
-            <div class="border border-gray-200 rounded-lg p-4">
-              <div class="font-medium text-gray-900 mb-2">Video</div>
-              <div class="text-2xl font-bold text-purple-600">${{ video_rate|default:"0.00" }}/min</div>
-              <a href="{% url 'edit_rate' 'video' %}" class="mt-3 text-purple-600 hover:text-purple-800 text-sm font-medium">Edit →</a>
-            </div>
-          </div>
-        </div>
-
-        <!-- Availability Calendar -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Weekly Availability</h2>
-          <div class="space-y-3">
-            {% for day_name, status in availability_by_day %}
-              <div class="flex justify-between items-center py-3 border-b border-gray-200 last:border-b-0">
-                <div class="font-medium text-gray-900">{{ day_name }}</div>
-                <div>
-                  {% if status %}
-                    <span class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded text-sm font-medium">
-                      {{ status }}
-                    </span>
-                  {% else %}
-                    <span class="inline-block px-3 py-1 bg-gray-100 text-gray-600 rounded text-sm">Not Available</span>
-                  {% endif %}
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-          <a href="{% url 'edit_availability' %}" class="mt-6 inline-block text-blue-600 hover:text-blue-800 font-medium">
-            Edit Availability →
+            <p class="text-green-400 font-semibold">${{ session.rate_per_minute|floatformat:2 }}/min</p>
           </a>
         </div>
-      </div>
+        {% empty %}
+        <p class="text-white/50 text-center py-6 font-body">No sessions yet.</p>
+        {% endfor %}
+      </section>
 
-      <!-- Right Column: Sidebar -->
-      <div>
-        
-        <!-- Rating & Reviews -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Your Rating</h3>
-          <div class="text-center mb-4">
-            <div class="text-4xl font-bold text-yellow-500">{{ avg_rating|floatformat:1 }}</div>
-            <div class="text-sm text-gray-600 mt-1">Based on {{ total_reviews }} reviews</div>
+      <!-- Rates -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-heading text-2xl text-soulseer-pink">My Rates</h2>
+          <a href="{% url 'reader_rates' %}" class="text-sm text-soulseer-pink/80 hover:text-soulseer-pink transition font-body">Edit Rates</a>
+        </div>
+        <div class="grid grid-cols-3 gap-4 font-body">
+          {% for rate in rates %}
+          <div class="p-4 rounded border border-soulseer-pink/20 text-center">
+            <p class="text-white/60 text-xs uppercase tracking-wider">{{ rate.modality|title }}</p>
+            <p class="text-xl font-bold text-white mt-1">${{ rate.rate_per_minute }}/min</p>
           </div>
+          {% empty %}
+          <p class="text-white/50 col-span-3 text-center py-4">No rates set. <a href="{% url 'reader_rates' %}" class="text-soulseer-pink">Set them now</a></p>
+          {% endfor %}
         </div>
+      </section>
 
-        <!-- Recent Reviews -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Latest Reviews</h3>
-          {% if latest_reviews %}
-            <div class="space-y-4">
-              {% for review in latest_reviews %}
-                <div class="border-b border-gray-200 pb-3 last:border-b-0">
-                  <div class="flex items-center justify-between mb-2">
-                    <div class="font-medium text-gray-900">{{ review.client.profile.display_name }}</div>
-                    <div class="text-yellow-500 text-sm">⭐ {{ review.rating }}/5</div>
-                  </div>
-                  <p class="text-gray-700 text-sm">{{ review.body|truncatewords:20 }}</p>
-                  <div class="text-xs text-gray-600 mt-2">{{ review.created_at|date:"M d, Y" }}</div>
-                </div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <p class="text-gray-600 text-center py-4">No reviews yet</p>
-          {% endif %}
+      <!-- Availability -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-heading text-2xl text-soulseer-pink">Availability</h2>
+          <a href="{% url 'reader_availability' %}" class="text-sm text-soulseer-pink/80 hover:text-soulseer-pink transition font-body">Edit</a>
         </div>
+        {% with days="Mon,Tue,Wed,Thu,Fri,Sat,Sun" %}
+        {% for slot in availability %}
+        <div class="py-3 border-b border-white/10 last:border-0 flex justify-between font-body">
+          <p class="text-white">{{ slot.get_day_of_week_display|default:slot.day_of_week }}</p>
+          <p class="text-white/70">{{ slot.start_time|time:"H:i" }} – {{ slot.end_time|time:"H:i" }}</p>
+        </div>
+        {% empty %}
+        <p class="text-white/50 text-center py-4 font-body">No availability set. <a href="{% url 'reader_availability' %}" class="text-soulseer-pink">Set it now</a></p>
+        {% endfor %}
+        {% endwith %}
+      </section>
 
-        <!-- Upcoming Bookings -->
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Upcoming Sessions</h3>
-          {% if upcoming_sessions %}
-            <div class="space-y-3">
-              {% for booking in upcoming_sessions %}
-                <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <div class="font-medium text-gray-900">{{ booking.slot.client.profile.display_name }}</div>
-                  <div class="text-sm text-gray-600 mt-1">{{ booking.slot.start|date:"M d, H:i" }}</div>
-                  <a href="{% url 'session_detail' booking.slot.id %}" class="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 block">
-                    Join Session →
-                  </a>
-                </div>
-              {% endfor %}
-            </div>
-          {% else %}
-            <p class="text-gray-600 text-center py-4">No upcoming sessions</p>
-          {% endif %}
+      <!-- Upcoming Bookings -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50">
+        <h2 class="font-heading text-2xl text-soulseer-pink mb-4">Upcoming Bookings</h2>
+        {% for booking in upcoming_bookings %}
+        <div class="py-4 border-b border-white/10 last:border-0 font-body">
+          <p class="text-white">{{ booking.slot.start|date:"M d, Y \a\t H:i" }}</p>
+          <p class="text-white/60 text-sm">{{ booking.slot.duration_minutes }} minutes</p>
         </div>
-      </div>
+        {% empty %}
+        <p class="text-white/50 text-center py-6 font-body">No upcoming bookings.</p>
+        {% endfor %}
+      </section>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Rating -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50 text-center">
+        <h3 class="font-heading text-xl text-soulseer-pink mb-2">Rating</h3>
+        <p class="text-5xl font-bold text-soulseer-gold">{{ avg_rating|floatformat:1|default:"—" }}</p>
+        <p class="text-white/50 text-sm font-body mt-2">{{ review_count }} review{{ review_count|pluralize }}</p>
+      </section>
+
+      <!-- Reviews -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50">
+        <h3 class="font-heading text-xl text-soulseer-pink mb-4">Recent Reviews</h3>
+        {% for rev in reviews %}
+        <div class="py-3 border-b border-white/10 last:border-0 font-body">
+          <div class="flex justify-between text-sm">
+            <p class="text-white">{{ rev.client.get_full_name|default:"Client" }}</p>
+            <p class="text-soulseer-gold">{{ rev.rating }}★</p>
+          </div>
+          {% if rev.body %}<p class="text-white/60 text-xs mt-1">{{ rev.body|truncatewords:15 }}</p>{% endif %}
+        </div>
+        {% empty %}
+        <p class="text-white/50 text-center py-4 font-body text-sm">No reviews yet.</p>
+        {% endfor %}
+      </section>
+
+      <!-- Quick Links -->
+      <section class="p-6 rounded-lg border border-soulseer-pink/30 bg-soulseer-darker/50 font-body">
+        <h3 class="font-heading text-xl text-soulseer-pink mb-4">Quick Links</h3>
+        <ul class="space-y-3">
+          <li><a href="{% url 'reader_rates' %}" class="text-white/80 hover:text-soulseer-pink transition">Manage Rates</a></li>
+          <li><a href="{% url 'reader_availability' %}" class="text-white/80 hover:text-soulseer-pink transition">Set Availability</a></li>
+          <li><a href="{% url 'messages_inbox' %}" class="text-white/80 hover:text-soulseer-pink transition">Messages</a></li>
+          <li><a href="{% url 'live_list' %}" class="text-white/80 hover:text-soulseer-pink transition">Go Live</a></li>
+          <li><a href="{% url 'profile_edit' %}" class="text-white/80 hover:text-soulseer-pink transition">Edit Profile</a></li>
+        </ul>
+      </section>
     </div>
   </div>
 </div>
-{% endblock %}
 {% endblock %}

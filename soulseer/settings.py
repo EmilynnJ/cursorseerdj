@@ -24,15 +24,11 @@ DATABASE_URL = env('DATABASE_URL', default=env('NEON_DB_CONNECTION_STRING', defa
 if DATABASE_URL:
     DATABASES = {'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
 else:
+    # Fall back to SQLite for local development if no PostgreSQL config is provided
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': env('PGDATABASE', default='neondb'),
-            'USER': env('PGUSER', default='neondb_owner'),
-            'PASSWORD': env('PGPASSWORD', default=''),
-            'HOST': env('PGHOST', default='localhost'),
-            'PORT': env('PGPORT', default='5432'),
-            'OPTIONS': {'sslmode': env('PGSSLMODE', default='require')},
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 

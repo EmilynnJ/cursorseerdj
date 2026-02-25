@@ -1,15 +1,89 @@
-{% extends 'base.html' %}
-{% block title %}About - SoulSeer{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}About SoulSeer{% endblock %}
+
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-16">
-  <h1 class="font-heading text-5xl text-soulseer-pink mb-8">About SoulSeer</h1>
-  <div class="font-body text-lg space-y-6 text-white/90">
-    <p>At SoulSeer, we are dedicated to providing ethical, compassionate, and judgment-free spiritual guidance. Our mission is twofold: to offer clients genuine, heart-centered readings and to uphold fair, ethical standards for our readers.</p>
-    <p>Founded by psychic medium Emilynn, SoulSeer was created as a response to the corporate greed that dominates many psychic platforms. Unlike other apps, our readers keep the majority of what they earn and play an active role in shaping the platform.</p>
-    <p>SoulSeer is more than just an app—it's a soul tribe. A community of gifted psychics united by our life's calling: to guide, heal, and empower those who seek clarity on their journey.</p>
-  </div>
-  <div class="mt-12">
-    <img src="https://i.postimg.cc/s2ds9RtC/FOUNDER.jpg" alt="Emilyn - Founder" class="rounded-lg max-w-sm border border-soulseer-pink/30">
+<div class="container mx-auto px-4 py-12 fade-in">
+  <div class="max-w-6xl mx-auto">
+    <!-- Hero Section -->
+    <div class="text-center mb-12 celestial-accent">
+      <h1 class="font-heading text-5xl md:text-6xl text-soulseer-pink mb-6">About SoulSeer</h1>
+      <p class="text-xl text-soulseer-gold mb-8">A Premium Spiritual Reading Platform</p>
+      <div class="w-32 h-1 bg-soulseer-gold mx-auto mb-12"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-soulseer-darker rounded-2xl p-8 md:p-12 mb-12 shadow-2xl border border-soulseer-pink/20">
+      <div class="prose prose-lg max-w-none text-white">
+        <p class="text-lg leading-relaxed mb-6">
+          At SoulSeer, we are dedicated to providing ethical, compassionate, and judgment-free spiritual guidance.
+          Our mission is twofold: to offer clients genuine, heart-centered readings and to uphold fair, ethical
+          standards for our readers.
+        </p>
+
+        <p class="text-lg leading-relaxed mb-6">
+          Founded by psychic medium Emilynn, SoulSeer was created as a response to the corporate greed that dominates
+          many psychic platforms. Unlike other apps, our readers keep the majority of what they earn and play an
+          active role in shaping the platform.
+        </p>
+
+        <p class="text-lg leading-relaxed mb-8">
+          SoulSeer is more than just an app—it's a soul tribe. A community of gifted psychics united by our life's
+          calling: to guide, heal, and empower those who seek clarity on their journey.
+        </p>
+      </div>
+
+      <div class="text-center">
+        <a href="{% url 'home' %}" class="btn-primary inline-block">Join Our Community</a>
+      </div>
+    </div>
+
+    <!-- Founder Section -->
+    <div class="text-center mb-12">
+      <h2 class="font-heading text-4xl text-soulseer-pink mb-8">Our Founder</h2>
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+        <div class="flex-shrink-0">
+          <img src="https://i.postimg.cc/s2ds9RtC/FOUNDER.jpg" alt="Founder Emilynn, Psychic Medium"
+               class="w-64 h-64 md:w-80 md:h-80 rounded-full object-cover border-4 border-soulseer-gold shadow-lg">
+        </div>
+        <div class="max-w-2xl text-left">
+          <h3 class="font-heading text-3xl text-soulseer-pink mb-4">Emilynn</h3>
+          <p class="text-soulseer-gold text-xl mb-4">Psychic Medium & Founder</p>
+          <p class="text-lg leading-relaxed">
+            With over 15 years of experience as a professional psychic medium, Emilynn founded SoulSeer to create
+            a platform that truly serves both clients and readers with integrity, compassion, and fairness.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="bg-soulseer-darker rounded-2xl p-8 md:p-12 shadow-2xl border border-soulseer-gold/20">
+      <h2 class="font-heading text-4xl text-soulseer-pink text-center mb-12">Our Mission</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center celestial-accent p-6 rounded-xl">
+          <div class="w-16 h-16 bg-soulseer-pink rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-white text-2xl">💖</span>
+          </div>
+          <h3 class="font-heading text-2xl text-soulseer-pink mb-4">Ethical Guidance</h3>
+          <p class="text-white">Providing genuine, heart-centered readings with compassion and integrity.</p>
+        </div>
+        <div class="text-center celestial-accent p-6 rounded-xl">
+          <div class="w-16 h-16 bg-soulseer-gold rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-white text-2xl">⚖️</span>
+          </div>
+          <h3 class="font-heading text-2xl text-soulseer-pink mb-4">Fair Compensation</h3>
+          <p class="text-white">Readers keep the majority of earnings and help shape the platform.</p>
+        </div>
+        <div class="text-center celestial-accent p-6 rounded-xl">
+          <div class="w-16 h-16 bg-soulseer-pink rounded-full flex items-center justify-center mx-auto mb-4">
+            <span class="text-white text-2xl">🌟</span>
+          </div>
+          <h3 class="font-heading text-2xl text-soulseer-pink mb-4">Soul Tribe</h3>
+          <p class="text-white">A community united by our calling to guide, heal, and empower.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}

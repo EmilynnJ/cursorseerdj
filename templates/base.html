@@ -31,12 +31,78 @@
     }
   </script>
   <style>
-    body { font-family: 'Playfair Display', serif; }
+    body {
+      font-family: 'Playfair Display', serif;
+      background-image: url('https://i.postimg.cc/sXdsKGTK/DALL-E-2025-.6-o6-14-56-29-A-vivid-ethereal-background-image-design-for-a-psychic-reading-app.webp');
+      background-size: cover;
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
     .font-heading { font-family: 'Alex Brush', cursive; }
     .text-soulseer-pink { color: #FF69B4; }
-    .bg-soulseer-dark { background-color: #0a0a0f; }
-    .bg-soulseer-darker { background-color: #050508; }
+    .bg-soulseer-dark { background-color: rgba(10, 10, 15, 0.85); }
+    .bg-soulseer-darker { background-color: rgba(5, 5, 8, 0.95); }
     .border-soulseer-pink { border-color: #FF69B4; }
+    .text-soulseer-gold { color: #D4AF37; }
+    .bg-soulseer-gold { background-color: #D4AF37; }
+    .border-soulseer-gold { border-color: #D4AF37; }
+
+    /* Celestial accents */
+    .celestial-accent {
+      position: relative;
+      overflow: hidden;
+    }
+    .celestial-accent::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    /* Smooth animations */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Button styles */
+    .btn-primary {
+      background-color: #FF69B4;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .btn-primary:hover {
+      background-color: #FF4D94;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(255, 105, 180, 0.3);
+    }
+    .btn-secondary {
+      background-color: #D4AF37;
+      color: #0a0a0f;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .btn-secondary:hover {
+      background-color: #B8992E;
+      transform: translateY(-2px);
+    }
   </style>
   {% block extra_head %}{% endblock %}
 </head>

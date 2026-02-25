@@ -1,13 +1,49 @@
-<footer class="bg-soulseer-darker border-t border-soulseer-pink/20 py-8 mt-auto">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-      <span class="font-heading text-2xl text-soulseer-pink">SoulSeer</span>
-      <div class="flex gap-6 font-body text-sm opacity-80">
-        <a href="{% url 'about' %}" class="hover:text-soulseer-pink transition">About</a>
-        <a href="{% url 'help' %}" class="hover:text-soulseer-pink transition">Help</a>
-        <a href="{% url 'privacy' %}" class="hover:text-soulseer-pink transition">Privacy</a>
-        <a href="{% url 'terms' %}" class="hover:text-soulseer-pink transition">Terms</a>
+<footer class="bg-soulseer-darker/90 border-t border-soulseer-gold/20 mt-auto">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h3 class="font-heading text-2xl text-soulseer-pink mb-4">SoulSeer</h3>
+        <p class="text-sm text-gray-300 mb-4">Premium spiritual readings with ethical, compassionate guides.</p>
+        <div class="flex gap-3">
+          <a href="#" class="text-soulseer-gold hover:text-soulseer-pink transition">📘</a>
+          <a href="#" class="text-soulseer-gold hover:text-soulseer-pink transition">🐦</a>
+          <a href="#" class="text-soulseer-gold hover:text-soulseer-pink transition">📷</a>
+        </div>
       </div>
+      <div>
+        <h4 class="font-heading text-xl text-soulseer-pink mb-4">Platform</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="{% url 'home' %}" class="text-gray-300 hover:text-soulseer-pink transition">Home</a></li>
+          <li><a href="{% url 'reader_list' %}" class="text-gray-300 hover:text-soulseer-pink transition">Readers</a></li>
+          <li><a href="{% url 'about' %}" class="text-gray-300 hover:text-soulseer-pink transition">About</a></li>
+          <li><a href="{% url 'live_list' %}" class="text-gray-300 hover:text-soulseer-pink transition">Live</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-heading text-xl text-soulseer-pink mb-4">Community</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="{% url 'shop_list' %}" class="text-gray-300 hover:text-soulseer-pink transition">Shop</a></li>
+          <li><a href="{% url 'community_forum' %}" class="text-gray-300 hover:text-soulseer-pink transition">Forums</a></li>
+          <li><a href="{% url 'messages_inbox' %}" class="text-gray-300 hover:text-soulseer-pink transition">Messages</a></li>
+          <li><a href="{% url 'schedule' %}" class="text-gray-300 hover:text-soulseer-pink transition">Schedule</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-heading text-xl text-soulseer-pink mb-4">Support</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="{% url 'help' %}" class="text-gray-300 hover:text-soulseer-pink transition">Help Center</a></li>
+          <li><a href="{% url 'privacy' %}" class="text-gray-300 hover:text-soulseer-pink transition">Privacy</a></li>
+          <li><a href="{% url 'terms' %}" class="text-gray-300 hover:text-soulseer-pink transition">Terms</a></li>
+          <li><a href="#" class="text-gray-300 hover:text-soulseer-pink transition">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-soulseer-gold/20 pt-6 text-center">
+      <p class="text-xs text-gray-400">
+        © {{ now|date:"Y" }} SoulSeer. All rights reserved.
+        <a href="{% url 'privacy' %}" class="hover:text-soulseer-pink transition">Privacy Policy</a> |
+        <a href="{% url 'terms' %}" class="hover:text-soulseer-pink transition">Terms of Service</a>
+      </p>
     </div>
   </div>
 </footer>

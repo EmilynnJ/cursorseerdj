@@ -189,12 +189,21 @@ document.addEventListener('DOMContentLoaded', function() {
   
   endBtn.addEventListener('click', async function() {
     if (!confirm('Are you sure you want to end this session?')) return;
-    
+
     await client.leave();
-    if (localAudioTrack) localAudioTrack.close(); 
+    if (localAudioTrack) localAudioTrack.close();
     if (localVideoTrack) localVideoTrack.close();
-    
-    window.location.href = '/sessions/' + sessionId + '/end/';
+
+    // POST to API endpoint (avoids GET on @require_POST view)
+    await fetch('/api/sessions/' + sessionId + '/end/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrfToken,
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      credentials: 'same-origin'
+    });
+    window.location.href = '/sessions/' + sessionId + '/';
   });
 });
 </script>

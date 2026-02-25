@@ -9,6 +9,7 @@ from core.admin_views import (
     resolve_flag,
     dismiss_flag,
     refund_adjustment,
+    trigger_payouts,
 )
 
 urlpatterns = [
@@ -17,6 +18,7 @@ urlpatterns = [
     path('admin/moderation/<int:pk>/resolve/', resolve_flag, name='resolve_flag'),
     path('admin/moderation/<int:pk>/dismiss/', dismiss_flag, name='dismiss_flag'),
     path('admin/refunds/', refund_adjustment, name='refund_adjustment'),
+    path('admin/payouts/trigger/', trigger_payouts, name='trigger_payouts'),
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
     path('accounts/', include('accounts.urls')),

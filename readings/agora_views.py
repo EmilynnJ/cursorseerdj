@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 @login_required
 @require_POST
-def get_rtc_token(request):
+def get_rtc_token(request, session_id):
     """
     Generate Agora RTC token for session access.
     
@@ -38,7 +38,6 @@ def get_rtc_token(request):
     - Generate short-lived token (1200s = 20 min)
     """
     try:
-        session_id = request.POST.get('session_id')
         session = get_object_or_404(Session, pk=session_id)
         
         # Verify user is client or reader
@@ -334,9 +333,14 @@ def get_livestream_token(request, livestream_id):
         
         # Check visibility
         if livestream.visibility == 'premium':
-            # TODO: Verify premium access
+            # Premium streams require authentication and a minimum wallet balance ($1.00)
             if request.user != livestream.reader:
-                pass  # In production, check subscription
+                try:
+                    wallet = Wallet.objects.get(user=request.user)
+                    if wallet.balance < 1:
+                        return JsonResponse({'error': 'Premium stream: insufficient wallet balance'}, status=402)
+                except Wallet.DoesNotExist:
+                    return JsonResponse({'error': 'Premium stream: wallet required'}, status=402)
         elif livestream.visibility == 'private':
             if request.user != livestream.reader:
                 return JsonResponse({'error': 'Private livestream'}, status=403)

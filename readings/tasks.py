@@ -39,7 +39,7 @@ def billing_tick():
 
             if wallet.balance < rate:
                 logger.info(f"Session {session.pk} low balance (${wallet.balance} < ${rate}), pausing")
-                session.grace_until = now + timezone.timedelta(minutes=2)
+                session.grace_until = now + timezone.timedelta(minutes=5)
                 session.reconnect_count += 1
                 session.transition('paused')
                 session.save(update_fields=['grace_until', 'reconnect_count'])
@@ -68,7 +68,7 @@ def billing_tick():
             session.save()
         except ValueError as e:
             logger.warning(f"Session {session.pk} insufficient balance error: {e}, pausing")
-            session.grace_until = now + timezone.timedelta(minutes=2)
+            session.grace_until = now + timezone.timedelta(minutes=5)
             session.transition('paused')
             session.save(update_fields=['grace_until'])
         except Exception as e:
@@ -196,6 +196,60 @@ def session_finalize(session_id):
         logger.error(f"Session {session_id} not found for finalization")
     except Exception as e:
         logger.error(f"Session {session_id} finalization error: {e}")
+
+
+@shared_task
+def payout_readers():
+    """
+    Batch payout: transfer accumulated reader earnings to their Stripe Connect accounts.
+    Designed to run weekly via Celery beat. Idempotent per payout via unique idempotency key.
+    Only pays out readers with a stripe_connect_account_id and balance >= $5.00.
+    """
+    import stripe
+    from django.conf import settings
+    from readers.models import ReaderProfile
+    from wallets.models import Wallet, debit_wallet
+    import uuid
+
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    minimum_payout = Decimal('5.00')
+
+    readers = ReaderProfile.objects.filter(
+        stripe_connect_account_id__isnull=False,
+    ).exclude(stripe_connect_account_id='').select_related('user')
+
+    for rp in readers:
+        try:
+            wallet = Wallet.objects.get(user=rp.user)
+        except Wallet.DoesNotExist:
+            continue
+
+        amount = wallet.balance
+        if amount < minimum_payout:
+            continue
+
+        idem_key = f"payout_{rp.pk}_{uuid.uuid4()}"
+        amount_cents = int((amount * 100).quantize(Decimal('1')))
+
+        try:
+            transfer = stripe.Transfer.create(
+                amount=amount_cents,
+                currency='usd',
+                destination=rp.stripe_connect_account_id,
+                metadata={'reader_id': str(rp.pk), 'idempotency_key': idem_key},
+                idempotency_key=idem_key,
+            )
+            debit_wallet(
+                wallet,
+                amount,
+                'payout',
+                idem_key,
+                reference_type='stripe_transfer',
+                reference_id=transfer.id,
+            )
+            logger.info(f"Payout ${amount} to reader {rp.pk} (transfer {transfer.id})")
+        except Exception as e:
+            logger.error(f"Payout failed for reader {rp.pk}: {e}")
 
 
 @shared_task

@@ -19,4 +19,5 @@ Django-filter>=23.1
 django-cors-headers>=4.3
 Pillow>=10.1
 python-dotenv>=1.0
+serverless-wsgi>=3.0
 # cryptography - rsa library used instead

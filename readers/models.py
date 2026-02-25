@@ -49,9 +49,15 @@ class ReaderRate(models.Model):
         return f"{self.reader.slug} {self.modality} ${self.rate_per_minute}/min"
 
 
+DAY_OF_WEEK_CHOICES = [
+    (0, 'Monday'), (1, 'Tuesday'), (2, 'Wednesday'),
+    (3, 'Thursday'), (4, 'Friday'), (5, 'Saturday'), (6, 'Sunday'),
+]
+
+
 class ReaderAvailability(models.Model):
     reader = models.ForeignKey(ReaderProfile, on_delete=models.CASCADE, related_name='availability')
-    day_of_week = models.PositiveSmallIntegerField(help_text='0=Monday, 6=Sunday')
+    day_of_week = models.PositiveSmallIntegerField(choices=DAY_OF_WEEK_CHOICES, help_text='0=Monday, 6=Sunday')
     start_time = models.TimeField()
     end_time = models.TimeField()
 

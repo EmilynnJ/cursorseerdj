@@ -8,7 +8,7 @@ import environ
 
 env = environ.Env(
     DEBUG=(bool, False),
-    ALLOWED_HOSTS=(list, ['localhost', '127.0.0.1']),
+    ALLOWED_HOSTS=(list, ['localhost', '127.0.0.1', 'cursorseerdj.onrender.com']),
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,7 +22,22 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 import dj_database_url
 DATABASE_URL = env('DATABASE_URL', default=env('NEON_DB_CONNECTION_STRING', default=''))
 if DATABASE_URL:
-    DATABASES = {'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+    try:
+        DATABASES = {'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+        # Add SSL configuration for Neon database
+        DATABASES['default']['OPTIONS'] = {
+            'sslmode': 'require',
+            'sslrootcert': None,  # Neon uses public certificates
+        }
+    except Exception as e:
+        print(f"Failed to parse DATABASE_URL: {e}")
+        # Fall back to SQLite if PostgreSQL connection fails
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 else:
     # Fall back to SQLite for local development if no PostgreSQL config is provided
     DATABASES = {
